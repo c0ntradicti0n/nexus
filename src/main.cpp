@@ -1,28 +1,28 @@
-#include <sstream>
-#include <vector>
 #include <fstream>
-#include <iostream>
 #include <iomanip>
+#include <iostream>
+#include <sstream>
 #include <string>
+#include <vector>
 
 #include <math.h>
 
-#include <stdlib.h>
 #include <cstdlib>
 #include <ctype.h>
+#include <stdlib.h>
 #include <unistd.h>
 
 #include <time.h>
 
 #include <regex>
 
-#include <set>
-#include <map>
 #include <algorithm>
+#include <map>
+#include <set>
 
-#include "basis Hybrid.h"
+#include "basis.h"
 
-using namespace std;  // stefan
+using namespace std; // stefan
 
 #include <time.h>
 
@@ -37,13 +37,14 @@ string read_file_str(string filename) {
     string s;
     getline(f, s, '\0');
     f.close();
-    return s; }
+    return s;
+}
 
-const char *fen_char[] = {  // bei writ()
+const char *fen_char[] = { // bei writ()
     "S_Tr",   "S_Kr",   "S_K",    "S_D",    "S_T",  "S_L",  "S_P",
     "S_B",    "S_Bu",   "S_Bp_r", "S_Bp_l", "S_Bx", "LEER", "W_Bx",
     "W_Bp_l", "W_Bp_r", "W_Bu",   "W_B",    "W_P",  "W_L",  "W_T",
-    "W_D",    "W_K",    "W_Kr",   "W_Tr",   "RAND" };
+    "W_D",    "W_K",    "W_Kr",   "W_Tr",   "RAND"};
 
 void read_fen(Spielfeld sp, string s) {
     std::regex rgx_fen("(\\\\d|[A-Za-y0-9])");
@@ -53,11 +54,11 @@ void read_fen(Spielfeld sp, string s) {
     int pos;
     int figur;
     for (std::sregex_iterator i =
-                std::sregex_iterator(s.begin(), s.end(), rgx_fen);
-            // Figuren finden
-            i != std::sregex_iterator();
+             std::sregex_iterator(s.begin(), s.end(), rgx_fen);
+         // Figuren finden
+         i != std::sregex_iterator();
 
-            ++i) {
+         ++i) {
         cout << "@";
         std::smatch m = *i;
         // if (i != s.end())
@@ -75,20 +76,18 @@ void read_fen(Spielfeld sp, string s) {
         grundfeld[pos] = x - figurenanzahl;
         // Auf Grundfeld setzen
 
-        ii++; }
-    return; }
+        ii++;
+    }
+    return;
+}
 
-template <class T, size_t N>
-constexpr size_t size(T(&)[N]) {
-    return N; }
-
-
+template <class T, size_t N> constexpr size_t size(T (&)[N]) { return N; }
 
 int main(int argc, char **argv) {
     int index;
     char *fvalue = NULL;
     string svalue;
-    int ladefeld[120] = {RAND };
+    int ladefeld[120] = {RAND};
     opterr = 0;
     vector<string> zuege;
     std::regex rgx_feld("(\\.|[A-Za-y]{3})");
@@ -104,7 +103,6 @@ int main(int argc, char **argv) {
     feldtyp *xbrettchen = new feldtyp;
     denkpaar *xzugstapel = new denkpaar[200];
 
-
     bool exit = false;
     int pos1;
     int pos2;
@@ -117,18 +115,18 @@ int main(int argc, char **argv) {
 
     while ((c = getopt(argc, argv, "aus:f:")) != -1)
         switch (c) {
-        case 'f': {  // Farbe setzen
+        case 'f': { // Farbe setzen
             fvalue = optarg;
-            eigene_farbe = atoi(fvalue); }
-        break;
-        case 'u': {  // User modus
-            _user = true; }
-        break;
-        case 'a': {  // Allein mit sich spielen
-            allein = true; }
-        break;
+            eigene_farbe = atoi(fvalue);
+        } break;
+        case 'u': { // User modus
+            _user = true;
+        } break;
+        case 'a': { // Allein mit sich spielen
+            allein = true;
+        } break;
 
-        case 's': {  // Datei einlesen, aus Kommandozeile kopiert
+        case 's': { // Datei einlesen, aus Kommandozeile kopiert
             *grundfeld = *ladefeld;
             svalue = optarg;
             cout << svalue;
@@ -137,14 +135,14 @@ int main(int argc, char **argv) {
             // Datei lesen
             cout << s;
             for (std::sregex_iterator i =
-                        std::sregex_iterator(s.begin(), s.end(), rgx_feld);
-                    // Figuren finden
-                    i != std::sregex_iterator(); ++i) {
+                     std::sregex_iterator(s.begin(), s.end(), rgx_feld);
+                 // Figuren finden
+                 i != std::sregex_iterator(); ++i) {
                 cout << "@";
                 std::smatch m = *i;
                 int x = std::distance(
-                            figuren_char,
-                            std::find(figuren_char, figuren_char + 27, m[1].str()));
+                    figuren_char,
+                    std::find(figuren_char, figuren_char + 27, m[1].str()));
                 cout << ii << ":" << x << " " << flush;
                 // Positionen in der Liste der Figurennamen finden
                 pos = 120 - (21 + ((int)(ii) / 8) * 10 + 8 - ii % 8);
@@ -155,11 +153,12 @@ int main(int argc, char **argv) {
                 grundfeld[pos] = x - figurenanzahl;
                 // Auf Grundfeld setzen
 
-                ii++; }
+                ii++;
+            }
             cout << " geladenes Spielfeld: \n";
             disp(grundfeld);
-            geladen = true; }
-        break;
+            geladen = true;
+        } break;
         case '?':
             if (optopt == 'c')
                 fprintf(stderr, "Option -%c requires an argument.\n", optopt);
@@ -169,12 +168,15 @@ int main(int argc, char **argv) {
                 fprintf(stderr, "Unknown option character `\\x%x'.\n", optopt);
             return 1;
         default:
-            abort(); }
+            abort();
+        }
 
     {
         for (int i = 0; i < ende + 2; i++) {
             testbrett[i] = new feldtyp;
-            testspiel[i] = new Spielfeld(); } }
+            testspiel[i] = new Spielfeld();
+        }
+    }
 
     Spielfeld spiel(grundfeld, +1, 0);
 
@@ -191,16 +193,16 @@ int main(int argc, char **argv) {
 
             readCSV(file, csvData);
 
-            for(csvVector::iterator i = csvData.begin(); i != csvData.end(); ++i)
+            for(csvVector::iterator i = csvData.begin(); i != csvData.end();
+       ++i)
        {
-                for(vector<string>::iterator j = i->begin(); j != i->end(); ++j) {
-                    cout << *j << " ";
+                for(vector<string>::iterator j = i->begin(); j != i->end(); ++j)
+       { cout << *j << " ";
                     //if (*j
                     }
                 }
             }
     */
-
 
     // UCI Protokoll
     if (!_user)
@@ -211,36 +213,45 @@ int main(int argc, char **argv) {
 
             if (spoken.is_open()) {
                 try {
-                    spoken << command << flush << "\n"; }
-                catch (const std::ios_base::failure &e) {
-                    std::cout << "Caught std::ios_base::failure: " << typeid(e).name()
-                              << std::endl; }
-                catch (const std::exception &e) {
+                    spoken << command << flush << "\n";
+                } catch (const std::ios_base::failure &e) {
+                    std::cout
+                        << "Caught std::ios_base::failure: " << typeid(e).name()
+                        << std::endl;
+                } catch (const std::exception &e) {
                     std::cout << "Caught std::exception: " << typeid(e).name()
-                              << std::endl; } }
-            else {
-                cout << "Unable to open file"; }
+                              << std::endl;
+                }
+            } else {
+                cout << "Unable to open file";
+            }
 
-beginning:
+        beginning:
 
             if (command == "-user") {
                 status = user;
-                break; }
+                break;
+            }
             if (command == "-show") {
-                spiel.disp(); }
+                spiel.disp();
+            }
             if (command == "-show_csv") {
-                spiel.disp_cleanest(); }
+                spiel.disp_cleanest();
+            }
             // wichtige Initkommandos - wo man antworten muss
 
             if (command == "uci") {
-                cout << "id name NEXUS 221014 NeuNull\n";  // 750250 6000
+                cout << "id name NEXUS 221014 NeuNull\n"; // 750250 6000
                 cout << "id author Albrecht Fiebiger & Stefan Werner\n";
-                cout << "uciok\n"; }
+                cout << "uciok\n";
+            }
 
             if (command == "isready") {
-                cout << "readyok\n"; }
+                cout << "readyok\n";
+            }
             if (command == "quit") {
-                return 0; }
+                return 0;
+            }
 
             // Spielkommandos...
             if (command == "position") {
@@ -259,73 +270,90 @@ beginning:
                             cin >> command;
                             spoken << command << flush << "\n";
 
-
-
                             denkpaar _zug;
                             int i;
                             int j;
                             for (i = 0; i <= 7; i++) {
                                 if ((command[0] == buchstaben1[i]) ||
-                                        (command[0] == buchstaben2[i])) {
+                                    (command[0] == buchstaben2[i])) {
                                     for (j = 0; j <= 7; j++) {
                                         if (command[1] == zahlen[j]) {
-                                            _zug.z.pos.pos1 = 21 + j * 10 + i; } } } }
+                                            _zug.z.pos.pos1 = 21 + j * 10 + i;
+                                        }
+                                    }
+                                }
+                            }
                             for (i = 0; i <= 7; i++) {
                                 if ((command[2] == buchstaben1[i]) ||
-                                        (command[2] == buchstaben2[i])) {
+                                    (command[2] == buchstaben2[i])) {
                                     for (j = 0; j <= 7; j++) {
                                         if (command[3] == zahlen[j]) {
-                                            _zug.z.pos.pos2 = 21 + j * 10 + i; } } } }
+                                            _zug.z.pos.pos2 = 21 + j * 10 + i;
+                                        }
+                                    }
+                                }
+                            }
 
                             spiel.makeZugstapel();
                             bool falsch = true;
                             for (i = 0; i < spiel.n; i++) {
-                                if ((zugstapel[spiel.Stufe][i].z.id == _zug.z.id)) {
-                                    spiel.realer_zug(zugstapel[spiel.Stufe][i], zuege);
+                                if ((zugstapel[spiel.Stufe][i].z.id ==
+                                     _zug.z.id)) {
+                                    spiel.realer_zug(zugstapel[spiel.Stufe][i],
+                                                     zuege);
 
                                     spiel.zug_reset();
                                     _zug = zugstapel[spiel.Stufe][i];
-                                    //	Analysedatei.note (_zug, eigene_farbe * -1, false);
+                                    //	Analysedatei.note (_zug, eigene_farbe *
+                                    //-1, false);
                                     falsch = false;
-                                    break; } }
-                            //for (auto e : zuege) cout << e << " ";
+                                    break;
+                                }
+                            }
+                            // for (auto e : zuege) cout << e << " ";
                             if (falsch == true)
-                                goto beginning;  // eine Goto-Anweisung; Wehe dem
+                                goto beginning; // eine Goto-Anweisung; Wehe dem
                             // Spag ettiprogramm!
-                            zug_nummer += 1; } } } }
+                            zug_nummer += 1;
+                        }
+                    }
+                }
+            }
 
             if (command == "go") {
                 int Restzeit_W;
                 int Restzeit_S;
                 int Restzeit;
 
-
-
-                for (cin >> command; command != "wtime" && command != "btime"; ) {
-                    cin >> command;}
-
-
+                for (cin >> command;
+                     command != "wtime" && command != "btime";) {
+                    cin >> command;
+                }
 
                 if (command == "wtime") {
 
-                    cin >> Restzeit_W; spoken << command << flush << "\n";
+                    cin >> Restzeit_W;
+                    spoken << command << flush << "\n";
                     cin >> command;
-                     }
-
-
+                }
 
                 if (command == "btime") {
-                    cin >> Restzeit_S; spoken << command << flush << "\n";
-                     }
+                    cin >> Restzeit_S;
+                    spoken << command << flush << "\n";
+                }
 
-
-                if (spiel.Farbe == 1) {Restzeit = Restzeit_W;} else Restzeit = Restzeit_S;
-              //  cout << Restzeit << "\n";
+                if (spiel.Farbe == 1) {
+                    Restzeit = Restzeit_W;
+                } else
+                    Restzeit = Restzeit_S;
+                //  cout << Restzeit << "\n";
                 t1 = clock();
                 spiel.setStufe(0);
-                for(int i=21; i<99; i++) {
-                    for(int j=21; j<99; j++) {
-                        historyMoves[i][j] = 0; } }
+                for (int i = 21; i < 99; i++) {
+                    for (int j = 21; j < 99; j++) {
+                        historyMoves[i][j] = 0;
+                    }
+                }
 
                 //    int devwert = 0;
                 // int f = 0;
@@ -344,14 +372,13 @@ beginning:
                             beta = letzte_wertung+100;
                         }
 
-                         wert = bp(spiel, spiel.Farbe, alpha, beta, 0, _stopp, 1);
+                         wert = bp(spiel, spiel.Farbe, alpha, beta, 0, _stopp,
+                     1);
 
                             if (wert <= alpha || wert >= beta)
                                 {*/
-                    wert = bp(spiel, spiel.Farbe, -MAX_WERT, MAX_WERT, 0, _stopp, 1);//}
-
-
-
+                    wert = bp(spiel, spiel.Farbe, -MAX_WERT, MAX_WERT, 0,
+                              _stopp, 1); //}
 
                     //      if (_stopp==stopp-4) devwert = wert;
                     /*     else {
@@ -362,10 +389,11 @@ beginning:
                     loop:
 
                               if (delta >= 26) {
-                                  wert = bp(spiel, spiel.Farbe, -MAX_WERT, MAX_WERT, 0, _stopp, 1);
-                                  break;
+                                  wert = bp(spiel, spiel.Farbe, -MAX_WERT,
+                    MAX_WERT, 0, _stopp, 1); break;
                               }
-                              wert = bp(spiel, spiel.Farbe, alpha, beta, 0, _stopp, 1);
+                              wert = bp(spiel, spiel.Farbe, alpha, beta, 0,
+                    _stopp, 1);
 
                     /*              if (wert <= alpha) {
 
@@ -374,7 +402,8 @@ beginning:
                                   delta += delta / 4 + 5;
                                   goto loop;
 
-                                  //  wert = bp(spiel, spiel.Farbe, alpha, beta, 0, _stopp);
+                                  //  wert = bp(spiel, spiel.Farbe, alpha, beta,
+                    0, _stopp);
                               }
 
                               if (wert >= beta) {
@@ -384,7 +413,8 @@ beginning:
                                   delta += delta / 4 + 5;
                                   goto loop;
 
-                                  //   wert = bp(spiel, spiel.Farbe, alpha, beta, 0, _stopp);
+                                  //   wert = bp(spiel, spiel.Farbe, alpha,
+                    beta, 0, _stopp);
                               }
                               //	if (_stopp>=stopp)break;*/
 
@@ -393,21 +423,22 @@ beginning:
                     //    if (clock() - t1 > 4500)
                     //     break;
                     int Zeitfaktor = 1;
-                    if (zug_nummer <= 120) Zeitfaktor = 60-zug_nummer/4;
-                    else Zeitfaktor = 30;
+                    if (zug_nummer <= 120)
+                        Zeitfaktor = 60 - zug_nummer / 4;
+                    else
+                        Zeitfaktor = 30;
 
                     /*if (zug_nummer <= 52) Zeitfaktor = 51-zug_nummer/2;
                     else Zeitfaktor = 25;*/
 
-
-                    if ((clock() - t1)*1.5 >= Restzeit/Zeitfaktor) {
+                    if ((clock() - t1) * 1.5 >= Restzeit / Zeitfaktor) {
                         stopp_tatsaechlich = _stopp;
-                        break; }
+                        break;
+                    }
 
                     //       stopp += 1;  //*/
                     //      }
                 }
-
 
                 t2 = clock();
                 timeline = (double)(timeline * (zug_nummer - 1) / zug_nummer +
@@ -423,35 +454,50 @@ beginning:
                 switch (spiel.check_end(zuege)) {
                 case matt: {
                     cout << "Verloren\n";
-                    break; }
+                    break;
+                }
                 case patt: {
                     cout << "Patt\n";
-                    break; }
+                    break;
+                }
                 case remis: {
                     cout << "Remis\n";
-                    break; }
+                    break;
+                }
                 case schachmatt: {
                     cout << "Gewonnen\n";
-                    break; }
+                    break;
+                }
                 case nothing: {
                     exit = false;
-                    break; }
+                    break;
+                }
                 default: {
                     cout << "Unbekanntes Spielende!";
-                    break; } }
-                cout << "info depth " << stopp_tatsaechlich << " score cp " << wert/1.5 << " pv " << grundfeld_bezeichnungen[bester_zug[0].z.pos.pos1]
-                     << grundfeld_bezeichnungen[bester_zug[0].z.pos.pos2] << " " << grundfeld_bezeichnungen[bester_zug[1].z.pos.pos1]
-                     << grundfeld_bezeichnungen[bester_zug[1].z.pos.pos2] << " " << grundfeld_bezeichnungen[bester_zug[2].z.pos.pos1]
-                     << grundfeld_bezeichnungen[bester_zug[2].z.pos.pos2] << " " << grundfeld_bezeichnungen[bester_zug[3].z.pos.pos1]
-                     << grundfeld_bezeichnungen[bester_zug[3].z.pos.pos2] << " " << grundfeld_bezeichnungen[bester_zug[4].z.pos.pos1]
-                     << grundfeld_bezeichnungen[bester_zug[4].z.pos.pos2] << "\n";
-                cout << "bestmove " << grundfeld_bezeichnungen[bester_zug[0].z.pos.pos1]
-                     << grundfeld_bezeichnungen[bester_zug[0].z.pos.pos2] << "\n";
+                    break;
+                }
+                }
+                cout << "info depth " << stopp_tatsaechlich << " score cp "
+                     << wert / 1.5 << " pv "
+                     << grundfeld_bezeichnungen[bester_zug[0].z.pos.pos1]
+                     << grundfeld_bezeichnungen[bester_zug[0].z.pos.pos2] << " "
+                     << grundfeld_bezeichnungen[bester_zug[1].z.pos.pos1]
+                     << grundfeld_bezeichnungen[bester_zug[1].z.pos.pos2] << " "
+                     << grundfeld_bezeichnungen[bester_zug[2].z.pos.pos1]
+                     << grundfeld_bezeichnungen[bester_zug[2].z.pos.pos2] << " "
+                     << grundfeld_bezeichnungen[bester_zug[3].z.pos.pos1]
+                     << grundfeld_bezeichnungen[bester_zug[3].z.pos.pos2] << " "
+                     << grundfeld_bezeichnungen[bester_zug[4].z.pos.pos1]
+                     << grundfeld_bezeichnungen[bester_zug[4].z.pos.pos2]
+                     << "\n";
+                cout << "bestmove "
+                     << grundfeld_bezeichnungen[bester_zug[0].z.pos.pos1]
+                     << grundfeld_bezeichnungen[bester_zug[0].z.pos.pos2]
+                     << "\n";
 
-
-                zug_nummer += 1; } }
-        while (true);
-
+                zug_nummer += 1;
+            }
+        } while (true);
 
     // Benutzermodus
 
@@ -459,67 +505,74 @@ beginning:
         disp(spiel.to_feld());
         writ(spiel.to_feld());
 
-        if (!((zug_nummer == 1) && (eigene_farbe == 1))) {  // Benutzerzug
+        if (!((zug_nummer == 1) && (eigene_farbe == 1))) { // Benutzerzug
             bool ok = false;
             do {
                 if (allein) {
                     eigene_farbe *= -1;
-                    break; }
+                    break;
+                }
                 denkpaar *zugstapel = new denkpaar[200];
                 int spez;
                 int n = spiel.zuggenerator();
-
 
                 cout << "Zug " << zug_nummer << ", von ";
                 pos1 = eingabe();
                 if (pos1 == 666 || pos2 == 666) {
                     eigene_farbe *= -1;
-                    break; }
+                    break;
+                }
                 cout << "nach ";
                 pos2 = eingabe();
 
                 if (pos1 == 666 || pos2 == 666) {
                     eigene_farbe *= -1;
-                    break; }
+                    break;
+                }
 
                 for (int i = 0; i < n; i++) {
                     if ((zugstapel[i].z.pos.pos1 == pos1) &&
-                            (zugstapel[i].z.pos.pos2 == pos2)) {
+                        (zugstapel[i].z.pos.pos2 == pos2)) {
                         ok = true;
                         spiel.realer_zug(zugstapel[i], zuege);
-                        //zuege_append(zuege, spiel.hash());
-                        //if (zuege_wied(zuege)) exit = true;
+                        // zuege_append(zuege, spiel.hash());
+                        // if (zuege_wied(zuege)) exit = true;
                         spiel.zug_reset();
-                        break; } }
+                        break;
+                    }
+                }
                 if (ok == false)
                     cout << "\nUnmoegliche Eingabe, vertippt?\n";
-                delete[] zugstapel; }
-            while (!ok); }
-
+                delete[] zugstapel;
+            } while (!ok);
+        }
 
         bewertet = 0;
         t1 = clock();
 
         spiel.setStufe(0);
         //  int devwert = 0;
-        for (int _stopp = 1; ; _stopp++) {
+        for (int _stopp = 1;; _stopp++) {
 
             cout << "Suchtiefe " << _stopp << "\n";
             //   if (_stopp == 0)
 
-            wert = bp(spiel, spiel.Farbe, -MAX_WERT, MAX_WERT, 0, _stopp, /*devwert, */1);
+            wert = bp(spiel, spiel.Farbe, -MAX_WERT, MAX_WERT, 0, _stopp,
+                      /*devwert, */ 1);
             //  if (_stopp == stopp-4) devwert = wert;
             /*     else {
                      int alpha = wert - 30;
                      int beta = wert + 30;
                      wert = bp(spiel, spiel.Farbe, alpha, beta, 0, _stopp,1 );
                      if (wert <= alpha || wert >= beta) {
-                         wert = bp(spiel, spiel.Farbe, -MAX_WERT, MAX_WERT, 0, _stopp, 1);
+                         wert = bp(spiel, spiel.Farbe, -MAX_WERT, MAX_WERT, 0,
+               _stopp, 1);
                      }*/
 
             //   }
             if ((clock() - t1 >= 300) && (_stopp >= stopp))
-                break; }
+                break;
+        }
 
         //    make_schema(zugstapel[spiel.getStufe()], spiel.n, 0);
         //   move_sort_schema();
@@ -536,8 +589,9 @@ beginning:
              << "total " << (double)(clock() - t0) / CLOCKS_PER_SEC << "s, "
              << "evaluations " << bewertet << "\n";
 
-        cout << "result     " << grundfeld_bezeichnungen[bester_zug[0].z.pos.pos1]
-             << " => " << grundfeld_bezeichnungen[bester_zug[0].z.pos.pos2] << "\n";
+        cout << "result     "
+             << grundfeld_bezeichnungen[bester_zug[0].z.pos.pos1] << " => "
+             << grundfeld_bezeichnungen[bester_zug[0].z.pos.pos2] << "\n";
 
         spiel.realer_zug(bester_zug[0], zuege);
 
@@ -545,33 +599,40 @@ beginning:
         switch (spiel.check_end(zuege)) {
         case matt: {
             cout << "Verloren\n";
-            break; }
+            break;
+        }
         case patt: {
             cout << "nn = " << spiel.nn;
             cout << "Patt\n";
-            break; }
+            break;
+        }
         case remis: {
             cout << "Remis\n";
-            break; }
+            break;
+        }
         case schachmatt: {
             cout << "Gewonnen/n";
-            break; }
+            break;
+        }
         case nothing: {
-            //cout << "weiter\n";
+            // cout << "weiter\n";
             exit = false;
-            break; }
+            break;
+        }
         default: {
             cout << "Unbekanntes Spielende!";
-            break; } }
+            break;
+        }
+        }
 
         spiel.zug_reset();
         zug_nummer++;
 
-    }
-    while (!exit);
+    } while (!exit);
 
     cout << "\n\n							"
-         "ENDE\n";
+            "ENDE\n";
 
     spoken.close();
-    return 0; }
+    return 0;
+}
