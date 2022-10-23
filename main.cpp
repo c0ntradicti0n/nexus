@@ -181,6 +181,8 @@ int main(int argc, char **argv) {
             string command;
             cin >> command;
 
+            PLOGI << command;
+
             if (spoken.is_open()) {
                 try {
                     spoken << command << flush << "\n";
