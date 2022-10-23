@@ -1,15 +1,44 @@
-TARGET = network
+TARGET = main
 TEST = check
-CC = clang
-CFLAGS = -g -Wall
+CC = g++
+CFLAGS = -g -Wall -I/plog/ -I.
 LIBS = -lpthread
 
-DEPS = basis.h
-OBJ = bp.o main.o
+
 
 GTEST = gtest-1.7.0/include
 LIBGTEST = /usr/local/lib/libgtest_main.a /usr/local/lib/libgtest.a
 TESTDIR = tests
+
+
+#-------
+
+SRCS := main.cpp io_util.cpp moves.cpp
+OBJS := $(SRCS:.cpp=.o)
+DEPS := $(SRCS:.cpp=.d)
+
+.PHONY: all clean
+
+all: prog
+
+run:
+	./prog
+
+prog: $(OBJS)
+	$(CC) $(CFLAGS) -o $@ $^
+
+%.o: %.cpp
+	$(CC) $(CFLAGS) -c -MMD -o $@ $<
+
+clean:
+	$(RM) prog $(OBJS) $(DEPS) $(TARGET) $(TEST)
+
+
+-include $(DEPS)
+
+
+
+# --------
 
 %.o: %.cpp $(DEPS)
 	$(CC) -c -o $@ $< $(CFLAGS)
@@ -21,9 +50,7 @@ $(TEST): $(OBJ)
 	$(CC) -o $@ $^ $(CFLAGS) -I $(GTEST) $(TESTDIR)/*.cc $(LIBGTEST) $(LIBS)
 	./$(TEST)
 
-clean:
-	rm -rf *.o *.gch
-	rm -f $(TARGET) $(TEST)
+
 
 install_gtest:
 	cmake -S . -B build

@@ -1,3 +1,11 @@
+#ifndef _BP_
+#define _BP_
+
+#include "io_util.h"
+
+#include "basis.cpp"
+#include "globals.h"
+
 feldtyp *testbrett[ende + 1];
 
 Spielfeld *testspiel[ende + 1];
@@ -202,7 +210,7 @@ int bp(Spielfeld &spiel, int farbe, int alpha, double beta, int stufe,
 
             bester_zug[stufe] = zugstapel[spiel.getStufe()][i];
             best_one[stufe] =
-                zugstapel[spiel.getStufe()][i]; // Aktueller PV-Zug für jede
+                zugstapel[spiel.getStufe()][i]; // Aktueller PV-Zug fï¿½r jede
                                                 // Stufe inkl. Zuginformationen
             //  best_one[stufe].bewertung *= 0.5; //ACHTUNG 5
 
@@ -225,3 +233,5 @@ int bp(Spielfeld &spiel, int farbe, int alpha, double beta, int stufe,
 
     return alpha;
 }
+
+#endif

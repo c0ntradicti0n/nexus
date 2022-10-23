@@ -1,36 +1,25 @@
+#include <algorithm>
+#include <cstdlib>
+#include <ctype.h>
 #include <fstream>
 #include <iomanip>
 #include <iostream>
-#include <sstream>
-#include <string>
-#include <vector>
-
-#include <math.h>
-
-#include <cstdlib>
-#include <ctype.h>
-#include <stdlib.h>
-#include <unistd.h>
-
-#include <time.h>
-
-#include <regex>
-
-#include <algorithm>
 #include <map>
-#include <set>
-
-#include "basis.h"
+#include <regex>
+#include <time.h>
+#include <unistd.h>
+#include "plog/Log.h"
+#include "plog/Initializers/RollingFileInitializer.h"
+#include "basis.cpp"
+#include "bp.cpp"
+#include "io_util.h"
+#include "moves.h"
 
 using namespace std; // stefan
-
-#include <time.h>
 
 ofstream spoken("spoken");
 
 // stefan
-
-#include "bp.cpp"
 
 string read_file_str(string filename) {
     fstream f(filename, fstream::in);
@@ -84,6 +73,9 @@ void read_fen(Spielfeld sp, string s) {
 template <class T, size_t N> constexpr size_t size(T (&)[N]) { return N; }
 
 int main(int argc, char **argv) {
+    plog::init(plog::debug, "log/nexus.log");
+    LOGD << "Start";
+
     int index;
     char *fvalue = NULL;
     string svalue;
@@ -156,7 +148,7 @@ int main(int argc, char **argv) {
                 ii++;
             }
             cout << " geladenes Spielfeld: \n";
-            disp(grundfeld);
+            display(grundfeld);
             geladen = true;
         } break;
         case '?':
@@ -181,28 +173,6 @@ int main(int argc, char **argv) {
     Spielfeld spiel(grundfeld, +1, 0);
 
     spiel.to_feldtyp(xbrettchen);
-
-    /*
-        disp_cleanest(grundfeld);
-        if (argc > 1) {
-            cout << "read " << argv[1] << " as csv file for start position";
-            string path_startfeld_csv = argv[1];
-            fstream file(path_startfeld_csv, ios::in);
-            typedef vector< vector<string> > csvVector;
-            csvVector csvData;
-
-            readCSV(file, csvData);
-
-            for(csvVector::iterator i = csvData.begin(); i != csvData.end();
-       ++i)
-       {
-                for(vector<string>::iterator j = i->begin(); j != i->end(); ++j)
-       { cout << *j << " ";
-                    //if (*j
-                    }
-                }
-            }
-    */
 
     // UCI Protokoll
     if (!_user)
@@ -233,7 +203,7 @@ int main(int argc, char **argv) {
                 break;
             }
             if (command == "-show") {
-                spiel.disp();
+                spiel.display();
             }
             if (command == "-show_csv") {
                 spiel.disp_cleanest();
@@ -355,89 +325,22 @@ int main(int argc, char **argv) {
                     }
                 }
 
-                //    int devwert = 0;
-                // int f = 0;
                 for (int _stopp = 1;; _stopp++) {
-                    //     make_schema(zugstapel[spiel.getStufe()], spiel.n, 0);
-                    //     move_sort_schema();
 
-                    //           if (_stopp == 1)
-                    /* Aspiration windows
-                     int alpha = -MAX_WERT;
-                        int beta = MAX_WERT;
-
-                        if (_stopp > 1) {
-                       // cout << letzte_wertung << "\n";
-                            alpha = letzte_wertung-100;
-                            beta = letzte_wertung+100;
-                        }
-
-                         wert = bp(spiel, spiel.Farbe, alpha, beta, 0, _stopp,
-                     1);
-
-                            if (wert <= alpha || wert >= beta)
-                                {*/
                     wert = bp(spiel, spiel.Farbe, -MAX_WERT, MAX_WERT, 0,
-                              _stopp, 1); //}
+                              _stopp, 1);
 
-                    //      if (_stopp==stopp-4) devwert = wert;
-                    /*     else {
-                              int delta = 25;
-                              int alpha = wert - delta;
-                              int beta = wert + delta;
-
-                    loop:
-
-                              if (delta >= 26) {
-                                  wert = bp(spiel, spiel.Farbe, -MAX_WERT,
-                    MAX_WERT, 0, _stopp, 1); break;
-                              }
-                              wert = bp(spiel, spiel.Farbe, alpha, beta, 0,
-                    _stopp, 1);
-
-                    /*              if (wert <= alpha) {
-
-                                 // beta = (alpha + beta) / 2;
-                                  alpha = wert - delta;
-                                  delta += delta / 4 + 5;
-                                  goto loop;
-
-                                  //  wert = bp(spiel, spiel.Farbe, alpha, beta,
-                    0, _stopp);
-                              }
-
-                              if (wert >= beta) {
-
-                                //  alpha = (alpha + beta) / 2;
-                                  beta = wert + delta;
-                                  delta += delta / 4 + 5;
-                                  goto loop;
-
-                                  //   wert = bp(spiel, spiel.Farbe, alpha,
-                    beta, 0, _stopp);
-                              }
-                              //	if (_stopp>=stopp)break;*/
-
-                    //  if ((_stopp >= stopp))
-                    //    break;
-                    //    if (clock() - t1 > 4500)
-                    //     break;
                     int Zeitfaktor = 1;
                     if (zug_nummer <= 120)
                         Zeitfaktor = 60 - zug_nummer / 4;
                     else
                         Zeitfaktor = 30;
 
-                    /*if (zug_nummer <= 52) Zeitfaktor = 51-zug_nummer/2;
-                    else Zeitfaktor = 25;*/
-
                     if ((clock() - t1) * 1.5 >= Restzeit / Zeitfaktor) {
                         stopp_tatsaechlich = _stopp;
                         break;
                     }
 
-                    //       stopp += 1;  //*/
-                    //      }
                 }
 
                 t2 = clock();
@@ -445,10 +348,6 @@ int main(int argc, char **argv) {
                                     (t2 - t1) / zug_nummer);
                 int spez;
                 denkpaar *zugstapel = new denkpaar[200];
-                /*	for (int j=21;j<99;j++) {
-
-                 deckzone_gegner[j] -= 0.5;
-                 deckzone_ich[j] -= 0.5;}*/
 
                 exit = true;
                 switch (spiel.check_end(zuege)) {
@@ -477,6 +376,7 @@ int main(int argc, char **argv) {
                     break;
                 }
                 }
+
                 cout << "info depth " << stopp_tatsaechlich << " score cp "
                      << wert / 1.5 << " pv "
                      << grundfeld_bezeichnungen[bester_zug[0].z.pos.pos1]
@@ -502,8 +402,7 @@ int main(int argc, char **argv) {
     // Benutzermodus
 
     do {
-        disp(spiel.to_feld());
-        writ(spiel.to_feld());
+        display(spiel.to_feld());
 
         if (!((zug_nummer == 1) && (eigene_farbe == 1))) { // Benutzerzug
             bool ok = false;
