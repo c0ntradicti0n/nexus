@@ -5,8 +5,8 @@
 #ifndef NEXUS_MOVES_H
 #define NEXUS_MOVES_H
 
-#include <vector>
 #include <string>
+#include <vector>
 
 using namespace std;
 
@@ -15,5 +15,4 @@ using namespace std;
 bool zuege_wied(vector<string> &_zuege);
 void zuege_append(vector<string> &zuege, string _hash);
 
-
-#endif //NEXUS_MOVES_H
+#endif // NEXUS_MOVES_H

@@ -7,49 +7,49 @@ static int eigene_farbe = 1; // Sicht des Computers --1-0
 static int stopp = 5;        // normale Suchtiefe, wird ver‚Ä∞ndert
 static int stopp_tatsaechlich = 0;
 
-static const int ende = 15;   // maximale Suchtiefe
+static const int ende = 15;          // maximale Suchtiefe
 static const int figurenanzahl = 12; // bei display)
 
 static const int MAX_WERT = 99999999;
 enum howitends {
-    matt = -MAX_WERT,
-    patt = -1,
-    remis = 0,
-    schaach = 1,
-    schachmatt = +MAX_WERT,
-    nothing
+  matt = -MAX_WERT,
+  patt = -1,
+  remis = 0,
+  schaach = 1,
+  schachmatt = +MAX_WERT,
+  nothing
 };
 enum espezial { NICHTS = 0, SCHACH = 1, UNRUH = 2 };
 enum spiel_status { Eroeffnung, Mittelspiel, Spaetspiel, Endspiel };
 static const char *spiel_status_namen[] = {"Eroeffnung", "Mittelspiel",
                                            "Mittel-Endspiel", "Endspiel"};
 enum figuren { // bei display)
-    S_Tr = -12,
-    S_Kr = -11,
-    S_K = -10,
-    S_D,
-    S_T,
-    S_L,
-    S_P,
-    S_B,
-    S_Bu,
-    S_Bp_r,
-    S_Bp_l,
-    S_Bx,
-    LEER = 0,
-    W_Bx,
-    W_Bp_l,
-    W_Bp_r,
-    W_Bu,
-    W_B,
-    W_P,
-    W_L,
-    W_T,
-    W_D,
-    W_K = 10,
-    W_Kr = 11,
-    W_Tr = 12,
-    RAND = 13
+  S_Tr = -12,
+  S_Kr = -11,
+  S_K = -10,
+  S_D,
+  S_T,
+  S_L,
+  S_P,
+  S_B,
+  S_Bu,
+  S_Bp_r,
+  S_Bp_l,
+  S_Bx,
+  LEER = 0,
+  W_Bx,
+  W_Bp_l,
+  W_Bp_r,
+  W_Bu,
+  W_B,
+  W_P,
+  W_L,
+  W_T,
+  W_D,
+  W_K = 10,
+  W_Kr = 11,
+  W_Tr = 12,
+  RAND = 13
 };
 
 static const char *figuren_char[] = { // bei display)
