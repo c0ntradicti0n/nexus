@@ -18,8 +18,6 @@ int bp (Spielfeld & spiel, int farbe, int alpha, double beta, int stufe, int _st
     double wertung;
 
 
-
-
     srand (time(NULL));
 
     //  make_schema(zugstapel[spiel.getStufe()], spiel.n, stufe);

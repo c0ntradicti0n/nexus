@@ -77,7 +77,6 @@ double K_Angriff_Springer = 0.25;
 //int Koenigsangriff_Er = 0;  //25 Koenigsangriff_Ich
 
 
-
 enum state { user, uci, gone, position };
 state status = uci;
 

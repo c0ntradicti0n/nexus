@@ -260,7 +260,6 @@ beginning:
                             spoken << command << flush << "\n";
 
 
-
                             denkpaar _zug;
                             int i;
                             int j;
