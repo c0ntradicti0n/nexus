@@ -2,7 +2,6 @@ feldtyp * testbrett[ende+1];
 
 Spielfeld * testspiel[ende+1];
 
-
 howitends __end = nothing;
 
 

@@ -2391,10 +2391,12 @@ double K_Safety_Wert = 0;//*/
     n += K_Safety_Wert;
      int Koordination_ich = 0;
     int Koordination_du = 0;
+    int Kontrolle_ich = 0;
+    int Kontrolle_du = 0;
 
     for (int i=21; i < 99; i++) {
-     if (zugzone_ich[i] > zugzone_du[i]) {if ((zugzone_ich[i+1] > zugzone_du[i+1]) || (zugzone_ich[i-1] > zugzone_du[i-1] ) || (zugzone_ich[i+10] > zugzone_du[i+10] ) || (zugzone_ich[i-10] > zugzone_du[i-10] )) Koordination_ich += 1; if ((zugzone_ich[i+1] == zugzone_du[i+1]) || (zugzone_ich[i-1] == zugzone_du[i-1] ) || (zugzone_ich[i+10] == zugzone_du[i+10] ) || (zugzone_ich[i-10] == zugzone_du[i-10] )) Koordination_ich += 0.5; }
-        if (zugzone_du[i] > zugzone_ich[i]) {if ((zugzone_du[i+1] > zugzone_ich[i+1]) || (zugzone_du[i-1] > zugzone_ich[i-1] ) || (zugzone_du[i+10] >  zugzone_ich[i+10] ) || (zugzone_du[i-10] > zugzone_ich[i-10] )) Koordination_du += 1; if ((zugzone_du[i+1] == zugzone_ich[i+1]) || (zugzone_du[i-1] == zugzone_ich[i-1] ) || (zugzone_du[i+10] == zugzone_ich[i+10] ) || (zugzone_du[i-10] == zugzone_ich[i-10] )) Koordination_du += 0.5; }
+     if (zugzone_ich[i] > zugzone_du[i]) {Kontrolle_ich += 1; if ((zugzone_ich[i+1] > zugzone_du[i+1]) || (zugzone_ich[i-1] > zugzone_du[i-1] ) || (zugzone_ich[i+10] > zugzone_du[i+10] ) || (zugzone_ich[i-10] > zugzone_du[i-10] )) Koordination_ich += 1; if ((zugzone_ich[i+1] == zugzone_du[i+1]) || (zugzone_ich[i-1] == zugzone_du[i-1] ) || (zugzone_ich[i+10] == zugzone_du[i+10] ) || (zugzone_ich[i-10] == zugzone_du[i-10] )) Koordination_ich += 0.5; }
+        if (zugzone_du[i] > zugzone_ich[i]) {Kontrolle_du += 1; if ((zugzone_du[i+1] > zugzone_ich[i+1]) || (zugzone_du[i-1] > zugzone_ich[i-1] ) || (zugzone_du[i+10] >  zugzone_ich[i+10] ) || (zugzone_du[i-10] > zugzone_ich[i-10] )) Koordination_du += 1; if ((zugzone_du[i+1] == zugzone_ich[i+1]) || (zugzone_du[i-1] == zugzone_ich[i-1] ) || (zugzone_du[i+10] == zugzone_ich[i+10] ) || (zugzone_du[i-10] == zugzone_ich[i-10] )) Koordination_du += 0.5; }
 
     }
 
@@ -2402,7 +2404,7 @@ double K_Safety_Wert = 0;//*/
   //   if (Raumzaehler_ich > Raumzaehler_du) {n += (Raumzaehler_ich / Raumzaehler_du * _eigene_farbe-1)*6; }
   //   if (Raumzaehler_du > Raumzaehler_ich) {n += (Raumzaehler_du / Raumzaehler_ich * -_eigene_farbe-1)*6; }
 
-   n += (Koordination_ich - Koordination_du) * _eigene_farbe * 45;
+   n += (Koordination_ich - Koordination_du) * _eigene_farbe * 45 + (Kontrolle_ich - Kontrolle_du) * _eigene_farbe * 5;
   return n;
 }
 
