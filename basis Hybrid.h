@@ -68,6 +68,7 @@ double AttSpr    = 0.55;
 double AttBau    = 3.5;
 double AttKoe    = 2; //???
 double KSafety = 800; // 446 ändern
+int Kontrolle = 10;
 double K_Angriff_Turm = 0.5;
 double K_Angriff_Laeufer = 0.25;
 double K_Angriff_Springer = 0.25;
@@ -567,6 +568,19 @@ RAND,	17, 10,  3, -7, -7,  3, 10, 17,RAND,
 RAND,	32, 26,  15,  6,  6,  15, 26, 32,		RAND,
 RAND,	RAND,	RAND,	RAND,	RAND,	RAND,	RAND,	RAND,	RAND,	RAND,
 RAND,	RAND,	RAND,	RAND,	RAND,	RAND,	RAND,	RAND,	RAND,	RAND};//*/
+/*double Zentrum[120] =
+{RAND,	RAND,	RAND,	RAND,	RAND,	RAND,	RAND,	RAND,	RAND,	RAND,
+RAND,	RAND,	RAND,	RAND,	RAND,	RAND,	RAND,	RAND,	RAND,	RAND,
+RAND,	1,1,1,1,1,1,1,1,RAND,
+RAND,	1,2,2,2,2,2,2,1,RAND,
+RAND,	1,2,3,3,3,3,2,1,RAND,
+RAND,	1,2,3,4,4,3,2,1,RAND,
+RAND,	1,2,3,4,4,3,2,1,RAND,
+RAND,	1,2,3,3,3,3,2,1,RAND,
+RAND,	1,2,2,2,2,2,2,1,RAND,
+RAND,	1,1,1,1,1,1,1,1,RAND,
+RAND,	RAND,	RAND,	RAND,	RAND,	RAND,	RAND,	RAND,	RAND,	RAND,
+RAND,	RAND,	RAND,	RAND,	RAND,	RAND,	RAND,	RAND,	RAND,	RAND};*/
 
 double materialwert[15] = // Materialwert 1.15
 {
@@ -2404,7 +2418,7 @@ double K_Safety_Wert = 0;//*/
   //   if (Raumzaehler_ich > Raumzaehler_du) {n += (Raumzaehler_ich / Raumzaehler_du * _eigene_farbe-1)*6; }
   //   if (Raumzaehler_du > Raumzaehler_ich) {n += (Raumzaehler_du / Raumzaehler_ich * -_eigene_farbe-1)*6; }
 
-   n += (Koordination_ich - Koordination_du) * _eigene_farbe * 45 + (Kontrolle_ich - Kontrolle_du) * _eigene_farbe * 5;
+   n += (Koordination_ich - Koordination_du) * _eigene_farbe * 45 + (Kontrolle_ich - Kontrolle_du) * _eigene_farbe * Kontrolle;
   return n;
 }
 
