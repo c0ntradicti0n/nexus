@@ -51,27 +51,29 @@ int sortiertiefe = 15; // Sortiertiefe - wieviele Z¬∏ge werden sortiert
 //int figurenwert_schwarz = 0;
 int figurenwert = 0;
 
-int KooIch       = 365;
+int KooIch       = 365;  //???
 int KooEr        = 50;  //???
 double AttackIch = 5;
 double AttackEr  = 3;
-int    DefIch1   = 75;
-int    DefIch2   = 80;
+int    DefIch1   = 80;
+int    DefIch2   = 80;  //???
 int    DefEr1    = 60;
-int    DefEr2    = 170; //???
-double AttDame   = 0.11;
+int    DefEr2    = 170;
+double AttDame   = 0.11;   //???
 int    MobTurm   = 9; //???
 double AttTurm   = 0.5; //???
 double MobLau    = 21; //???
 double AttLau    = 0.7; //???
-double AttSpr    = 0.55;
+double AttSpr    = 0.55;   //???
 double AttBau    = 3.5;
 double AttKoe    = 2; //???
-double KSafety = 800; // 446 ändern
+double KSafety = 800; // ??
 int Kontrolle = 10;
 double K_Angriff_Turm = 0.5;
 double K_Angriff_Laeufer = 0.25;
 double K_Angriff_Springer = 0.25;
+
+
 //double K_Angriff_Bauer = 0.05;//*/
 //double KSafe = 0.04;
 //int Koenigsangriff_Ich = 50;
@@ -1785,17 +1787,25 @@ void Spielfeld::write()  {
 inline double entwicklung(int feld[120], int farbe)    {
   double wertung = 0;
   int    dieses_feld;
+  //double faktor_eigene_farbe = 1;
+  //if (farbe != eigene_farbe) faktor_eigene_farbe = 2;
+
+
+
 
   for (int i = 21; i <= 98; i++)  {
     //dieses_feld = feld[i];
 
      if (feld[i] == RAND || (abs(feld[i]) > 6 && abs(feld[i])<10)) continue;
 
-    if (feld[i] == __STARTFELD[i]) wertung += 2 * __STARTPUNKTE[i];        // -kingzone_ich[i]*10;	//4.1
-    if (feld[i] == __STARTFELDx[i]) wertung -= 2 * __STARTPUNKTEx[i];                                    // -kingzone_gegner[i]*10;//-kingzone_ich[i]*10;	//4.1
+    if (feld[i] == __STARTFELD[i]) {
+
+            wertung += 2 * __STARTPUNKTE[i]; }       // -kingzone_ich[i]*10;	//4.1
+    if (feld[i] == __STARTFELDx[i]) {
+            wertung += 2 * __STARTPUNKTE[i]; }                                  // -kingzone_gegner[i]*10;//-kingzone_ich[i]*10;	//4.1
     //	else wertung -= 1 * __STARTPUNKTEx[i];}//-kingzone_gegner[i]*10;*/
-    if (feld[i] == __STARTFELDx2[i]) wertung += 1.7* __STARTPUNKTEx2[i];  // +kingzone_ich[i]*10;	//1.17
-    if (feld[i] == __STARTFELDx3[i]) wertung -=  1.7* __STARTPUNKTEx3[i];  // -kingzone_gegner[i]*10;
+    if (feld[i] == __STARTFELDx2[i]) wertung += 1.7 * __STARTPUNKTEx2[i];  // +kingzone_ich[i]*10;	//1.17
+    if (feld[i] == __STARTFELDx3[i]) wertung -=  1.7 * __STARTPUNKTEx3[i];  // -kingzone_gegner[i]*10;
     //REST PSQ
 /*    if (feld[i] == __STARTFELDx4[i]) wertung += 0.55* __STARTPUNKTEx4[i];  // +kingzone_ich[i]*10;	//1.17
     if (feld[i] == __STARTFELDx5[i]) wertung -=  0.55* __STARTPUNKTEx5[i];//*/
@@ -1816,7 +1826,7 @@ inline double material(int feld[120], int farbe)  {
  //figurenwert_weiss = 0;
   //  figurenwert_schwarz = 0;
   figurenwert = 0;
-for(int j=21; j<99; ++j) {kingzone[j] = 0;}
+for(int j=21; j<99; j++) {kingzone[j] = 0;}
   for (int i = 21; i <= 98; i++)     {
     figur = feld[i];
 
@@ -1846,6 +1856,8 @@ for(int j=21; j<99; ++j) {kingzone[j] = 0;}
        kingzone[i+20] = 1;
        kingzone[i+21] = 1;*/
        //}//*/
+
+
       if (abs(figur) == W_K||abs(figur) == W_Kr)
         {
           //  cout << "Koenig: " << i << "\n";
