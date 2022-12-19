@@ -589,15 +589,15 @@ double materialwert[15] = // Materialwert 1.15
   0,                      // NIL! 0
   100,                    // Startbauer 1
   500,                    // durchgestarteter Startbauer 2
-  33.3,                  // en passant Bauer 3
+  33.3,                   // en passant Bauer 3
   2250,                   // Superbauer 4
   20,                     // Bauer 5
-  66.666666666667,        // Pferd 6
+  64,                     // Pferd 6
   57.142857,              // Läufer 7
   75,                     // Turm 8
   133.3333333,            // Dame 9
   3058,                   // König 10
-  2780,            // Rochade König 11
+  2780,                   // Rochade König 11
   50,                     // Rochade Turm 12
 };
 
@@ -1798,11 +1798,9 @@ inline double entwicklung(int feld[120], int farbe)    {
 
      if (feld[i] == RAND || (abs(feld[i]) > 6 && abs(feld[i])<10)) continue;
 
-    if (feld[i] == __STARTFELD[i]) {
+    if (feld[i] == __STARTFELD[i])  wertung += 2 * __STARTPUNKTE[i];        // -kingzone_ich[i]*10;	//4.1
+    if (feld[i] == __STARTFELDx[i]) wertung -= 2 * __STARTPUNKTEx[i];                                   // -kingzone_gegner[i]*10;//-kingzone_ich[i]*10;	//4.1
 
-            wertung += 2 * __STARTPUNKTE[i]; }       // -kingzone_ich[i]*10;	//4.1
-    if (feld[i] == __STARTFELDx[i]) {
-            wertung += 2 * __STARTPUNKTE[i]; }                                  // -kingzone_gegner[i]*10;//-kingzone_ich[i]*10;	//4.1
     //	else wertung -= 1 * __STARTPUNKTEx[i];}//-kingzone_gegner[i]*10;*/
     if (feld[i] == __STARTFELDx2[i]) wertung += 1.7 * __STARTPUNKTEx2[i];  // +kingzone_ich[i]*10;	//1.17
     if (feld[i] == __STARTFELDx3[i]) wertung -=  1.7 * __STARTPUNKTEx3[i];  // -kingzone_gegner[i]*10;
