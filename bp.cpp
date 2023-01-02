@@ -159,7 +159,7 @@ int bp (Spielfeld & spiel, int farbe, int alpha, double beta, int stufe, int _st
         if (wertung > alpha) {
 
             bester_zug[stufe] = zugstapel[spiel.getStufe()][i];
-            best_one[stufe] = zugstapel[spiel.getStufe()][i]; //Aktueller PV-Zug für jede Stufe inkl. Zuginformationen
+            best_one[stufe] = zugstapel[spiel.getStufe()][i]; //Aktueller PV-Zug fï¿½r jede Stufe inkl. Zuginformationen
             //  best_one[stufe].bewertung *= 0.5; //ACHTUNG 5
 
             if (wertung >= beta) {
