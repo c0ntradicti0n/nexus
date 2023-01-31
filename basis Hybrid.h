@@ -392,7 +392,7 @@ int __STARTPUNKTEx[120] = // Wei√üe bauern
 { RAND, RAND,  RAND,  RAND,   RAND,  RAND,  RAND,  RAND, RAND,  RAND,
   RAND, RAND,  RAND,  RAND,   RAND,  RAND,  RAND,  RAND, RAND,  RAND,
   RAND, 0,     0,     0,      0,     0,  	0,     0,    0,     RAND,
-  RAND, 8,     16,    24,     32,    32,	24,    16,   8,     RAND,
+  RAND, 100,   100,   100,    100,   100,	100,   100,  100,   RAND,
   RAND, 3,     12,    20,     28,    28,    20,    12,   3,     RAND,
   RAND, -5,    4,     10,     20,    20,    10,    4,    -5,    RAND,
   RAND, -6,    4,     5,      16,    16,    5,     4,    -6,    RAND,
@@ -410,7 +410,7 @@ double __STARTPUNKTE[120] =
   RAND, -6,   4,     5,      16,    16,   5,    4,     -6,     RAND,
   RAND, -5,   4,     10,     20,    20,   10,   4,     -5,     RAND,
   RAND, 3,    12,    20,     28,    28,   20,   12,    3,      RAND,
-  RAND, 8,    16,    24,     32,    32,   24,   16,    8,      RAND,
+  RAND, 100,  100,   100,    100,   100,  100,  100,   100,   RAND,
   RAND, 0,    0,     0,      0,     0,    0,    0,     0,      RAND,
   RAND, RAND, RAND,  RAND,   RAND,  RAND, RAND, RAND,  RAND,   RAND,
   RAND, RAND, RAND,  RAND,   RAND,  RAND, RAND, RAND,  RAND,   RAND };
