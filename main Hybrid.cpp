@@ -233,8 +233,7 @@ beginning:
             // wichtige Initkommandos - wo man antworten muss
 
             if (command == "uci") {
-
-                cout << "id name NEXUS 230122 FB PSQ 100\n";  // 750250 6000
+                cout << "id name NEXUS 230131 CLOCK 1.7\n";  // 750250 6000
                 cout << "id author Albrecht Fiebiger & Stefan Werner\n";
                 cout << "uciok\n"; }
 
@@ -394,7 +393,7 @@ beginning:
                     else Zeitfaktor = 30;
 
 
-                    if ((clock() - t1)*1.5 >= Restzeit/Zeitfaktor || wert == MAX_WERT) {
+                    if ((clock() - t1) * 1.7 >= Restzeit / Zeitfaktor || wert == MAX_WERT) {
                         stopp_tatsaechlich = _stopp;
                         break; }
 
