@@ -68,7 +68,7 @@ double AttSpr    = 0.55;   //???
 double AttBau    = 3.5;
 double AttKoe    = 2; //???
 double KSafety   = 800; // ??
-int    Kontrolle = 12;
+int    Kontrolle = 13;
 double K_Angriff_Turm = 0.5;
 double K_Angriff_Laeufer = 0.25;
 double K_Angriff_Springer = 0.25;
@@ -2452,7 +2452,7 @@ double K_Safety_Wert = 0;//*/
   //   if (Raumzaehler_ich > Raumzaehler_du) {n += (Raumzaehler_ich / Raumzaehler_du * _eigene_farbe-1)*6; }
   //   if (Raumzaehler_du > Raumzaehler_ich) {n += (Raumzaehler_du / Raumzaehler_ich * -_eigene_farbe-1)*6; }
 
-   n += (Koordination_ich - Koordination_du) * _eigene_farbe * 54 + (Kontrolle_ich - Kontrolle_du) * _eigene_farbe * Kontrolle;
+   n += (Koordination_ich - Koordination_du) * _eigene_farbe * 58 + (Kontrolle_ich - Kontrolle_du) * _eigene_farbe * Kontrolle;
   return n;
 }
 
