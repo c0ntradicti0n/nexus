@@ -242,6 +242,8 @@ int main(int argc, char **argv) {
               cin >> command;
               spoken << command << flush << "\n";
 
+
+
               PLOGI << command << " turn " << spiel.Farbe << flush << "\n";
 
               denkpaar _zug;
@@ -293,9 +295,9 @@ int main(int argc, char **argv) {
         }
       }
 
-      int Restzeit = 4000;
-      int Restzeit_W = 4000;
-      int Restzeit_S = 4000;
+      int Restzeit = 40000000;
+      int Restzeit_W = 40000000;
+      int Restzeit_S = 40000000;
 
       if (command == "movetime") {
 
@@ -323,7 +325,6 @@ int main(int argc, char **argv) {
 
       if (command == "go") {
 
-        //  cout << Restzeit << "\n";
         t1 = clock();
         spiel.setStufe(0);
         for (int i = 21; i < 99; i++) {

@@ -187,7 +187,7 @@ int bp(Spielfeld &spiel, int farbe, int alpha, double beta, int stufe,
 
     zugstapel[spiel.getStufe()][i].bewertung = wertung;
 
-    if (stufe == 0 && _stopp == stopp) {
+    /*if (stufe == 0 && _stopp == stopp) {
       bewertet++;
       ;
       cout << "" << grundfeld_bezeichnungen[aktueller_zug[0].z.pos.pos1]
@@ -195,7 +195,7 @@ int bp(Spielfeld &spiel, int farbe, int alpha, double beta, int stufe,
            << " Bewertung: " << setw(5) << wertung << ", Zug-ID " << setw(6)
            << aktueller_zug[0].z.id << "\n";
       cout.flush();
-    }
+    }*/
     // else { if (stufe == 0) cout << "*" << flush;}
 
     if (wertung > alpha) {
