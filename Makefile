@@ -1,42 +1,35 @@
+#-------
 TARGET = main
 TEST = check
 CC = g++
 CFLAGS = -g -Wall -I/plog/ -I.
 LIBS = -lpthread
 
-
-
-GTEST = gtest-1.7.0/include
-LIBGTEST = /usr/local/lib/libgtest_main.a /usr/local/lib/libgtest.a
-TESTDIR = tests
-
-
-#-------
-
 SRCS := main.cpp io_util.cpp moves.cpp
 OBJS := $(SRCS:.cpp=.o)
 DEPS := $(SRCS:.cpp=.d)
+
+BUILD_DIR := versions/$(shell git rev-parse --short HEAD)
 
 .PHONY: all clean
 
 all: prog
 
 run:
-	./prog
+	./$(BUILD_DIR)/prog
 
 prog: $(OBJS)
-	$(CC) $(CFLAGS) -o $@ $^
+	mkdir -p $(BUILD_DIR)
+	$(CC) $(CFLAGS) -o $(BUILD_DIR)/$@ $^
 
 %.o: %.cpp
 	$(CC) $(CFLAGS) -c -MMD -o $@ $<
 
 clean:
-	$(RM) prog $(OBJS) $(DEPS) $(TARGET) $(TEST)
+	$(RM) $(BUILD_DIR)/prog $(OBJS) $(DEPS) $(TARGET) $(TEST)
 
 
 -include $(DEPS)
-
-
 
 # --------
 
@@ -44,23 +37,24 @@ clean:
 	$(CC) -c -o $@ $< $(CFLAGS)
 
 $(TARGET): $(OBJ) main.o
-	$(CC) -o $@ $^ $(CFLAGS)
+	mkdir -p $(BUILD_DIR)
+	$(CC) -o $(BUILD_DIR)/$@ $^ $(CFLAGS)
 
 $(TEST): $(OBJ)
-	$(CC) -o $@ $^ $(CFLAGS) -I $(GTEST) $(TESTDIR)/*.cc $(LIBGTEST) $(LIBS)
-	./$(TEST)
-
+	mkdir -p $(BUILD_DIR)
+	$(CC) -o $(BUILD_DIR)/$@ $^ $(CFLAGS) -I $(GTEST) $(TESTDIR)/*.cc $(LIBGTEST) $(LIBS)
+	./$(BUILD_DIR)/$(TEST)
 
 
 install_gtest:
-	cmake -S . -B build
-	cmake --build build
+	cmake -S . -B $(BUILD_DIR)
+	cmake --build $(BUILD_DIR)
 	git submodule update
 
 test:
-	cmake -S . -B build
-	cmake --build build
-	cd build && ctest
+	cmake -S . -B $(BUILD_DIR)
+	cmake --build $(BUILD_DIR)
+	cd $(BUILD_DIR) && ctest
 
 
 format:

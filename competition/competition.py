@@ -1,3 +1,4 @@
+import itertools
 import multiprocessing
 import os
 import re
@@ -9,12 +10,19 @@ from pprint import pprint
 
 import yaml
 
+from str_tools import group_by_prefix
+
 logging.basicConfig()
 logging.getLogger().setLevel(logging.INFO)
-from collections import Counter, defaultdict
+from collections import Counter
+
+versions = os.listdir("../versions")
+
+
 
 debug = False
 def play_a_game(_):
+    print (_)
     board = chess.Board()
     moves = []
 
@@ -37,44 +45,16 @@ def play_a_game(_):
 if debug:
     outcome =[play_a_game(1)]
 else:
+    fights = list(itertools.permutations(versions, 2)) * 100
+
     _pool = multiprocessing.Pool(10)
-    outcome = _pool.map(play_a_game, range(0, 1000))
+    outcome = _pool.map(play_a_game, enumerate(fights)  )
 
 outcome = list(Counter(outcome).items())
 
 
 # Convert the tuples to strings for easier comparison
 error_strings = list(([' '.join(map(str, error)) for error in outcome]))
-
-def group_by_prefix(errors):
-    # Base case: if there's only one error, just return it
-    if len(errors) <= 1:
-        return errors
-
-    # Split each error into words
-    split_errors = [error.split(' ') for error in errors]
-
-    # Find the longest common prefix of all errors
-    common_prefix = []
-    for words in zip(*split_errors):
-        if len(set(words)) == 1:
-            common_prefix.append(words[0])
-        else:
-            break
-
-    # Group the remaining parts of the errors by their next word
-    groups = defaultdict(list)
-    for error in split_errors:
-        # If the error is longer than the common prefix, add it to the appropriate group
-        if len(error) > len(common_prefix):
-            groups[error[len(common_prefix)]].append(' '.join(error))
-
-    # Now recursively group each group of errors
-    for key in groups:
-        groups[key] = group_by_prefix(groups[key])
-
-    # Finally, return a dictionary with the common prefix and the groups
-    return {'prefix': ' '.join(common_prefix), 'groups': dict(groups)}
 
 # Use this function to group the error strings
 grouped_errors = group_by_prefix(error_strings)
