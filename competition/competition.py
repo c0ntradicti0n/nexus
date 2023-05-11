@@ -18,40 +18,48 @@ from collections import Counter
 
 versions = os.listdir("../versions")
 
-
-
 debug = False
+
+
 def play_a_game(_):
-    print (_)
+    i, (white, black) = _
     board = chess.Board()
     moves = []
 
+    white_to_move = None
     try:
         while not board.is_game_over():
-            engine = chess.engine.SimpleEngine.popen_uci(r"../prog")
-            result = engine.play(board, chess.engine.Limit(time=200))#, info=chess.engine.INFO_ALL)
+            white_to_move = board.turn
+            if white_to_move:
+                engine = chess.engine.SimpleEngine.popen_uci(f"../versions/{white}/prog")
+            else:
+                engine = chess.engine.SimpleEngine.popen_uci(f"../versions/{black}/prog")
+            result = engine.play(board, chess.engine.Limit(time=200))
             board.push(result.move)
             pid = re.findall(r"(\d+)", str(engine))[0]
             os.system(f'kill {pid}')
+            fen = board.fen()
             moves = (tuple([m.__repr__()[15:19] for m in board.move_stack]))
 
-        print(f"{_} Game over. {board.result()} + FEN {board.starting_fen}")
-        print (board)
-        return board.result()
+        res = f"{(white, black)} >>> {board.result()} >>> {fen} >>> {i}"
+        print(board)
+        print(res)
+        return res
 
     except Exception as e:
-        return str(e), moves, str(board)
+        return f"error made by '{white if white_to_move else black}'", str(e), moves, str(board)
+
 
 if debug:
-    outcome =[play_a_game(1)]
+    outcome = [play_a_game((0, [versions[0], versions[1]]))]
 else:
     fights = list(itertools.permutations(versions, 2)) * 100
+    print(len(fights))
 
     _pool = multiprocessing.Pool(10)
-    outcome = _pool.map(play_a_game, enumerate(fights)  )
+    outcome = _pool.map(play_a_game, enumerate(fights))
 
 outcome = list(Counter(outcome).items())
-
 
 # Convert the tuples to strings for easier comparison
 error_strings = list(([' '.join(map(str, error)) for error in outcome]))

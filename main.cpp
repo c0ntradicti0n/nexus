@@ -15,11 +15,7 @@
 #include <time.h>
 #include <unistd.h>
 
-using namespace std; // stefan
-
-
-
-// stefan
+using namespace std;
 
 string read_file_str(string filename) {
   fstream f(filename, fstream::in);
@@ -44,27 +40,14 @@ void read_fen(Spielfeld sp, string s) {
   int figur;
   for (std::sregex_iterator i =
            std::sregex_iterator(s.begin(), s.end(), rgx_fen);
-       // Figuren finden
        i != std::sregex_iterator();
-
        ++i) {
     cout << "@";
     std::smatch m = *i;
-    // if (i != s.end())
-    //  x = std::distance(figuren_char, std::find(fen_char, fen_char + 27,
-    //  m[1].str()));
-    // else
-    //  atoi (
     cout << ii << ":" << x << " " << flush;
-    // Positionen in der Liste der Figurennamen finden
     pos = 120 - (21 + ((int)(ii) / 8) * 10 + 8 - ii % 8);
-    // Positionen auf dem Feld errechnen, mehrere Spiegelungen
-
     figur = x - figurenanzahl;
-    // Tatsaechliche Zahl fuer die Figuren errechnen
     grundfeld[pos] = x - figurenanzahl;
-    // Auf Grundfeld setzen
-
     ii++;
   }
   return;
