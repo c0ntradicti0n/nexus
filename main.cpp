@@ -17,7 +17,7 @@
 
 using namespace std; // stefan
 
-ofstream spoken("spoken");
+
 
 // stefan
 
@@ -183,19 +183,6 @@ int main(int argc, char **argv) {
 
       PLOGI << command;
 
-      if (spoken.is_open()) {
-        try {
-          spoken << command << flush << "\n";
-        } catch (const std::ios_base::failure &e) {
-          std::cout << "Caught std::ios_base::failure: " << typeid(e).name()
-                    << std::endl;
-        } catch (const std::exception &e) {
-          std::cout << "Caught std::exception: " << typeid(e).name()
-                    << std::endl;
-        }
-      } else {
-        cout << "Unable to open file";
-      }
 
     beginning:
 
@@ -227,20 +214,17 @@ int main(int argc, char **argv) {
       // Spielkommandos...
       if (command == "position") {
         cin >> command;
-        spoken << command << flush << "\n";
 
         if (command == "startpos") {
           spiel.setPos(grundfeld, +1, 0, zuege);
           zug_nummer = 1;
 
           cin >> command;
-          spoken << command << flush << "\n";
 
           if (command == "moves") {
             PLOGI << "MOVE";
             while (true) {
               cin >> command;
-              spoken << command << flush << "\n";
 
 
 
@@ -296,26 +280,23 @@ int main(int argc, char **argv) {
       }
 
       int Restzeit = 40000000;
-      int Restzeit_W = 40000000;
-      int Restzeit_S = 40000000;
+      int Restzeit_W = 4000000;
+      int Restzeit_S = 4000000;
 
       if (command == "movetime") {
 
         cin >> Restzeit;
-        spoken << command << flush << "\n";
         cin >> command;
       }
 
       if (command == "wtime") {
 
         cin >> Restzeit_W;
-        spoken << command << flush << "\n";
         cin >> command;
       }
 
       if (command == "btime") {
         cin >> Restzeit_S;
-        spoken << command << flush << "\n";
       }
 
       if (spiel.Farbe == 1) {
@@ -534,6 +515,5 @@ int main(int argc, char **argv) {
   cout << "\n\n							"
           "ENDE\n";
 
-  spoken.close();
   return 0;
 }

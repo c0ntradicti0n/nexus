@@ -1,2 +1,5 @@
 python-chess
 chess
+pyaml
+joblib
+suffix_trees
