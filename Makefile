@@ -54,7 +54,7 @@ install_gtest:
 test:
 	cmake -S . -B $(BUILD_DIR)
 	cmake --build $(BUILD_DIR)
-	cd $(BUILD_DIR) && ctest
+	cd $(BUILD_DIR) && ctest --output-on-failure
 
 
 format:
