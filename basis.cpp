@@ -233,6 +233,8 @@ inline void Spielfeld::setStufe(int _stufe) { Stufe = _stufe; }
 
 inline int Spielfeld::getStufe() { return Stufe; }
 
+
+
 inline void Spielfeld::zug(denkpaar &_zug) {
   setStufe(Stufe + 1);
 
@@ -254,6 +256,55 @@ inline void Spielfeld::zug(denkpaar &_zug) {
   setFarbe(Farbe * -1);
 
   Z = false;
+}
+
+
+
+int Spielfeld::convert_piece(char piece) {
+    /* converts a piece character to a piece integer */
+    switch (piece) {
+        case 'p': return S_P;
+        case 'r': return S_T;
+        case 'n': return S_L;
+        case 'b': return S_L;
+        case 'q': return S_D;
+        case 'k': return S_K;
+        case 'P': return W_P;
+        case 'R': return W_T;
+        case 'N': return W_L;
+        case 'B': return W_L;
+        case 'Q': return W_D;
+        case 'K': return W_K;
+        default: return LEER;
+    }
+}
+
+void Spielfeld::read_fen(std::string fen) {
+    /* FEN is a space-separated string
+     * 1st part: piece placement on the board
+     * 2nd part: active color
+     * 3rd part: castling availability
+     * 4th part: en passant target square
+     * 5th part: halfmove clock
+     * 6th part: fullmove number
+     */
+
+    int rank = 7; // 8th rank first
+    int file = 0; // a file first
+
+    for (char ch : fen) {
+        if (ch == '/') { // next rank
+            --rank;
+            file = 0;
+        } else if (isdigit(ch)) { // empty squares
+            file += ch - '0';
+        } else { // piece
+            Feld[rank][file] = convert_piece(ch);
+            ++file;
+        }
+
+        if (rank < 0 || file > 7) break; // Only parse the pieces part of the FEN
+    }
 }
 
 inline void Spielfeld::realer_zug(denkpaar &_zug, vector<string> &_zuege) {

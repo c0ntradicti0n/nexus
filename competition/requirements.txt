@@ -2,4 +2,4 @@ python-chess
 chess
 pyaml
 joblib
-suffix_trees
+more_itertools

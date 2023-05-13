@@ -18,7 +18,7 @@ from collections import Counter
 
 versions = os.listdir("../versions")
 
-debug = False
+debug = os.environ.get("DEBUG", False)
 
 
 def play_a_game(_):
@@ -39,25 +39,30 @@ def play_a_game(_):
             pid = re.findall(r"(\d+)", str(engine))[0]
             os.system(f'kill {pid}')
             fen = board.fen()
-            moves = (tuple([m.__repr__()[15:19] for m in board.move_stack]))
+            moves = list([m.__repr__()[15:19] for m in board.move_stack])
 
-        res = f"{(white, black)} >>> {board.result()} >>> {fen} >>> {i}"
+        res = white, black, board.result().split("-"), f"{(white, black)} >>> {board.result()} >>> {fen} >>> {i}"
         print(board)
         print(res)
         return res
 
     except Exception as e:
-        return f"error made by '{white if white_to_move else black}'", str(e), moves, str(board)
+        return white, black, f"error made by '{white if white_to_move else black}'", str(e), moves, str(board)
 
 
 if debug:
     outcome = [play_a_game((0, [versions[0], versions[1]]))]
 else:
-    fights = list(itertools.permutations(versions, 2)) * 100
+    fights = list(itertools.permutations(versions, 2)) * 15
     print(len(fights))
 
     _pool = multiprocessing.Pool(10)
     outcome = _pool.map(play_a_game, enumerate(fights))
+
+
+
+with open('stats.yml', 'w') as yaml_file:
+    yaml.dump([list(t) for t in outcome], yaml_file, default_flow_style=False)
 
 outcome = list(Counter(outcome).items())
 

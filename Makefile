@@ -63,3 +63,6 @@ format:
 
 lint:
 	cppclean src/
+
+kill:
+	killall -9 prog

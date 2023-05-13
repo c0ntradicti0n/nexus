@@ -31,27 +31,6 @@ const char *fen_char[] = { // bei writ()
     "W_Bp_l", "W_Bp_r", "W_Bu",   "W_B",    "W_P",  "W_L",  "W_T",
     "W_D",    "W_K",    "W_Kr",   "W_Tr",   "RAND"};
 
-void read_fen(Spielfeld sp, string s) {
-  std::regex rgx_fen("(\\\\d|[A-Za-y0-9])");
-
-  int ii = 0;
-  int x;
-  int pos;
-  int figur;
-  for (std::sregex_iterator i =
-           std::sregex_iterator(s.begin(), s.end(), rgx_fen);
-       i != std::sregex_iterator();
-       ++i) {
-    cout << "@";
-    std::smatch m = *i;
-    cout << ii << ":" << x << " " << flush;
-    pos = 120 - (21 + ((int)(ii) / 8) * 10 + 8 - ii % 8);
-    figur = x - figurenanzahl;
-    grundfeld[pos] = x - figurenanzahl;
-    ii++;
-  }
-  return;
-}
 
 template <class T, size_t N> constexpr size_t size(T (&)[N]) { return N; }
 
@@ -73,7 +52,7 @@ int main(int argc, char **argv) {
   int pos = 0;
   int figur;
   bool geladen = false;
-  bool allein = false;
+  bool play_alone = false;
   bool _user = false;
   feldtyp *xbrettchen = new feldtyp;
   denkpaar *xzugstapel = new denkpaar[200];
@@ -97,17 +76,18 @@ int main(int argc, char **argv) {
     case 'u': { // User modus
       _user = true;
     } break;
-    case 'a': { // Allein mit sich spielen
-      allein = true;
+    case 'a': { // play_alone mit sich spielen
+      play_alone = true;
     } break;
 
-    case 's': { // Datei einlesen, aus Kommandozeile kopiert
+    case 's': { 
+  
       *grundfeld = *ladefeld;
       svalue = optarg;
       cout << svalue;
       s = read_file_str(svalue);
       cout << "|" << s << "|";
-      // Datei lesen
+
       cout << s;
       for (std::sregex_iterator i =
                std::sregex_iterator(s.begin(), s.end(), rgx_feld);
@@ -119,14 +99,12 @@ int main(int argc, char **argv) {
             figuren_char,
             std::find(figuren_char, figuren_char + 27, m[1].str()));
         cout << ii << ":" << x << " " << flush;
-        // Positionen in der Liste der Figurennamen finden
+
         pos = 120 - (21 + ((int)(ii) / 8) * 10 + 8 - ii % 8);
-        // Positionen auf dem Feld errechnen, mehrere Spiegelungen
 
         figur = x - figurenanzahl;
-        // Tatsaechliche Zahl fuer die Figuren errechnen
+
         grundfeld[pos] = x - figurenanzahl;
-        // Auf Grundfeld setzen
 
         ii++;
       }
@@ -179,7 +157,6 @@ int main(int argc, char **argv) {
       if (command == "-show_csv") {
         spiel.disp_cleanest();
       }
-      // wichtige Initkommandos - wo man antworten muss
 
       if (command == "uci") {
         cout << "id name NEXUS 221014 NeuNull\n"; // 750250 6000
@@ -208,8 +185,6 @@ int main(int argc, char **argv) {
             PLOGI << "MOVE";
             while (true) {
               cin >> command;
-
-
 
               PLOGI << command << " turn " << spiel.Farbe << flush << "\n";
 
@@ -245,17 +220,14 @@ int main(int argc, char **argv) {
 
                   spiel.zug_reset();
                   _zug = zugstapel[spiel.Stufe][i];
-                  //	Analysedatei.note (_zug, eigene_farbe *
-                  //-1, false);
+
                   falsch = false;
                   break;
                 }
               }
 
-              // for (auto e : zuege) cout << e << " ";
               if (falsch == true)
-                goto beginning; // eine Goto-Anweisung; Wehe dem
-              // Spag ettiprogramm!
+                goto beginning; 
               zug_nummer += 1;
             }
           }
@@ -322,19 +294,19 @@ int main(int argc, char **argv) {
         exit = true;
         switch (spiel.check_end(zuege)) {
         case matt: {
-          cout << "Verloren\n";
+          cout << "looser\n";
           break;
         }
         case patt: {
-          cout << "Patt\n";
+          cout << "patt\n";
           break;
         }
         case remis: {
-          cout << "Remis\n";
+          cout << "stalemate\n";
           break;
         }
         case schachmatt: {
-          cout << "Gewonnen\n";
+          cout << "hero\n";
           break;
         }
         case nothing: {
@@ -342,7 +314,7 @@ int main(int argc, char **argv) {
           break;
         }
         default: {
-          cout << "Unbekanntes Spielende!";
+          cout << "unknown end";
           break;
         }
         }
@@ -366,15 +338,15 @@ int main(int argc, char **argv) {
       }
     } while (true);
 
-  // Benutzermodus
+  // user mode
 
   do {
     display(spiel.to_feld());
 
-    if (!((zug_nummer == 1) && (eigene_farbe == 1))) { // Benutzerzug
+    if (!((zug_nummer == 1) && (eigene_farbe == 1))) { // user move
       bool ok = false;
       do {
-        if (allein) {
+        if (play_alone) {
           eigene_farbe *= -1;
           break;
         }
@@ -401,14 +373,13 @@ int main(int argc, char **argv) {
               (zugstapel[i].z.pos.pos2 == pos2)) {
             ok = true;
             spiel.realer_zug(zugstapel[i], zuege);
-            // zuege_append(zuege, spiel.hash());
-            // if (zuege_wied(zuege)) exit = true;
+
             spiel.zug_reset();
             break;
           }
         }
         if (ok == false)
-          cout << "\nUnmoegliche Eingabe, vertippt?\n";
+          cout << "\nwrong input. retry\n";
         delete[] zugstapel;
       } while (!ok);
     }
@@ -417,31 +388,18 @@ int main(int argc, char **argv) {
     t1 = clock();
 
     spiel.setStufe(0);
-    //  int devwert = 0;
+
     for (int _stopp = 1;; _stopp++) {
 
       cout << "Suchtiefe " << _stopp << "\n";
-      //   if (_stopp == 0)
 
-      wert = bp(spiel, spiel.Farbe, -MAX_WERT, MAX_WERT, 0, _stopp,
-                /*devwert, */ 1);
-      //  if (_stopp == stopp-4) devwert = wert;
-      /*     else {
-               int alpha = wert - 30;
-               int beta = wert + 30;
-               wert = bp(spiel, spiel.Farbe, alpha, beta, 0, _stopp,1 );
-               if (wert <= alpha || wert >= beta) {
-                   wert = bp(spiel, spiel.Farbe, -MAX_WERT, MAX_WERT, 0,
-         _stopp, 1);
-               }*/
 
-      //   }
+      wert = bp(spiel, spiel.Farbe, -MAX_WERT, MAX_WERT, 0, _stopp, 1);
+      
       if ((clock() - t1 >= 300) && (_stopp >= stopp))
         break;
     }
 
-    //    make_schema(zugstapel[spiel.getStufe()], spiel.n, 0);
-    //   move_sort_schema();
     t2 = clock();
     timeline = (double)(timeline * (zug_nummer - 1) / zug_nummer +
                         (t2 - t1) / zug_nummer);
@@ -463,29 +421,28 @@ int main(int argc, char **argv) {
     exit = true;
     switch (spiel.check_end(zuege)) {
     case matt: {
-      cout << "Verloren\n";
+      cout << "looser\n";
       break;
     }
     case patt: {
       cout << "nn = " << spiel.nn;
-      cout << "Patt\n";
+      cout << "patt\n";
       break;
     }
     case remis: {
-      cout << "Remis\n";
+      cout << "stalemate\n";
       break;
     }
     case schachmatt: {
-      cout << "Gewonnen/n";
+      cout << "hero/n";
       break;
     }
     case nothing: {
-      // cout << "weiter\n";
       exit = false;
       break;
     }
     default: {
-      cout << "Unbekanntes Spielende!";
+      cout << "unknown end";
       break;
     }
     }
@@ -494,9 +451,6 @@ int main(int argc, char **argv) {
     zug_nummer++;
 
   } while (!exit);
-
-  cout << "\n\n							"
-          "ENDE\n";
 
   return 0;
 }

@@ -19,6 +19,9 @@ public:
     inline howitends check_end(vector<string> &_zuege);
     inline howitends last_moves();
 
+    int convert_piece(char piece);
+    void read_fen(std::string fen);
+
     int n;
     int nn;
     bool Z;
