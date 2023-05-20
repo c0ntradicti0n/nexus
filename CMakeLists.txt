@@ -3,7 +3,7 @@ project(my_project)
 
 # GoogleTest requires at least C++14
 set(CMAKE_CXX_STANDARD 14)
-
+set(CMAKE_BUILD_TYPE Debug)
 include(FetchContent)
 FetchContent_Declare(
   googletest
@@ -14,12 +14,21 @@ FetchContent_Declare(
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
 
-ADD_LIBRARY(io_util
-        io_util.cpp
-        )
-ADD_LIBRARY(moves
-        moves.cpp
-        )
+add_library(io_util
+  io_util.cpp
+)
+add_library(moves
+  moves.cpp
+)
+
+# Add the necessary source files or libraries for the undefined symbols
+# Replace "source_file1.cpp" and "source_file2.cpp" with the actual files
+add_library(surge
+  surge/src/position.cpp
+  surge/src/tables.cpp
+  surge/src/types.cpp
+)
+
 
 include_directories(${CMAKE_SOURCE_DIR}/plog)
 link_directories(${CMAKE_SOURCE_DIR}/plog)
@@ -30,29 +39,28 @@ set(FOO_SRCS "main.cpp")
 
 enable_testing()
 
-add_executable(
-  hello_test
-        tests/hello_test.cc
+add_executable(hello_test
+  tests/hello_test.cc
 )
-add_executable(
-        prog
-        main.cpp
-)
-target_link_libraries(
-  hello_test
-  GTest::gtest_main
-)
-target_link_libraries(
-        prog
-        io_util
-
-)
-target_link_libraries(
-        prog
-        moves
-
+add_executable(prog
+  main.cpp
 )
 
+# Link necessary libraries to the hello_test target
+target_link_libraries(hello_test
+  PRIVATE
+    GTest::gtest_main
+    io_util  # Add any other required libraries here
+    moves
+    surge
+)
+
+target_link_libraries(prog
+  PRIVATE
+    io_util
+    moves
+    surge
+)
 
 include(GoogleTest)
 gtest_discover_tests(hello_test)

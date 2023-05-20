@@ -1,6 +1,4 @@
-//
-// Created by stefan on 10/23/22.
-//
+#pragma once
 
 #include <fstream>
 #include <iomanip>
@@ -8,6 +6,11 @@
 #include <map>
 #include <regex>
 #include <set>
+
+#include "moves.h"
+#include "surge/src/position.h"
+#include "surge/src/tables.h"
+#include "surge/src/types.h"
 
 using namespace std;
 
@@ -44,5 +47,44 @@ bool zuege_wied(vector<string> &_zuege) {
     }
 
     return true;
+  }
+}
+
+std::string moveToString(const Move &m) {
+
+  std::ostringstream stream;
+  stream << m;
+  std::string moveString = stream.str();
+  return moveString.substr(0, 4);
+}
+
+
+std::string zugToString(const denkpaar &z) {
+  try {
+
+  if (z.castling && z.z.pos.pos1 == 25 && z.z.pos.pos2 == 27)
+    return "e1h1";
+  if (z.castling && z.z.pos.pos1 == 25 && z.z.pos.pos2 == 21)
+    return "e1a1";
+  if (z.castling && z.z.pos.pos1 == 95 && z.z.pos.pos2 == 97)
+    return "e8h8";
+  if (z.castling && z.z.pos.pos1 == 95 && z.z.pos.pos2 == 91)
+    return "e8a8";
+    if (z.figur == W_B && z.nw >1 && (z.figur)==W_B && z.z.pos.pos1 > 80) {
+      return std::string(grundfeld_bezeichnungen[z.z.pos.pos1]) +
+             std::string(grundfeld_bezeichnungen[z.z.pos.pos2]) +
+             pieceToFen[z.figur];
+    } else if (z.figur == S_B, z.nw >1 && (z.figur)==S_B && z.z.pos.pos1 < 30) {
+      return std::string(grundfeld_bezeichnungen[z.z.pos.pos1]) +
+             std::string(grundfeld_bezeichnungen[z.z.pos.pos2]) +
+             pieceToFen[z.figur];
+    }
+    
+  
+  return std::string(grundfeld_bezeichnungen[z.z.pos.pos1]) +
+         std::string(grundfeld_bezeichnungen[z.z.pos.pos2]);
+  } catch (const std::exception &e) {
+    cout << "ERROR" << e.what() << endl;
+    throw e;
   }
 }

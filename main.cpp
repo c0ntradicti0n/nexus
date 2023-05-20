@@ -11,6 +11,9 @@
 #include <iomanip>
 #include <iostream>
 #include <map>
+#include <plog/Appenders/ColorConsoleAppender.h>
+#include <plog/Appenders/RollingFileAppender.h>
+#include <plog/Log.h>
 #include <regex>
 #include <time.h>
 #include <unistd.h>
@@ -31,11 +34,22 @@ const char *fen_char[] = { // bei writ()
     "W_Bp_l", "W_Bp_r", "W_Bu",   "W_B",    "W_P",  "W_L",  "W_T",
     "W_D",    "W_K",    "W_Kr",   "W_Tr",   "RAND"};
 
-
 template <class T, size_t N> constexpr size_t size(T (&)[N]) { return N; }
+class CustomFormatter : public plog::TxtFormatter {
+public:
+  static std::string format(const plog::Record &record) {
+    // Return the logged message without any prefix
+    return record.getMessage();
+  }
+};
 
 int main(int argc, char **argv) {
-  plog::init(plog::debug, "log/nexus.log");
+  // Create a rolling file appender with log file name and maximum log file size
+  plog::RollingFileAppender<CustomFormatter> fileAppender("log.txt", 1000000,
+                                                          1);
+
+  // Initialize the logger with the appenders
+  plog::init(plog::debug, &fileAppender);
   LOGD << "Start";
 
   int index;
@@ -52,10 +66,10 @@ int main(int argc, char **argv) {
   int pos = 0;
   int figur;
   bool geladen = false;
+
   bool play_alone = false;
   bool _user = false;
   feldtyp *xbrettchen = new feldtyp;
-  denkpaar *xzugstapel = new denkpaar[200];
 
   bool exit = false;
   int pos1;
@@ -80,8 +94,8 @@ int main(int argc, char **argv) {
       play_alone = true;
     } break;
 
-    case 's': { 
-  
+    case 's': {
+
       *grundfeld = *ladefeld;
       svalue = optarg;
       cout << svalue;
@@ -142,8 +156,7 @@ int main(int argc, char **argv) {
       string command;
       cin >> command;
 
-      PLOGI << command;
-
+      PLOGI << command << " ";
 
     beginning:
 
@@ -174,19 +187,22 @@ int main(int argc, char **argv) {
       // Spielkommandos...
       if (command == "position") {
         cin >> command;
+        PLOGI << command << flush << "\n";
 
         if (command == "startpos") {
           spiel.setPos(grundfeld, +1, 0, zuege);
           zug_nummer = 1;
 
           cin >> command;
+          PLOGI << command << " ";
 
           if (command == "moves") {
-            PLOGI << "MOVE";
+
             while (true) {
+
               cin >> command;
 
-              PLOGI << command << " turn " << spiel.Farbe << flush << "\n";
+              PLOGI << command << " ";
 
               denkpaar _zug;
               int i;
@@ -211,6 +227,22 @@ int main(int argc, char **argv) {
                   }
                 }
               }
+              if (Feld[spiel.Stufe][_zug.z.pos.pos1] == W_Kr &&
+                  _zug.z.pos.pos1 == 25 &&
+                  _zug.z.pos.pos2 == 27 |
+                      Feld[spiel.Stufe][_zug.z.pos.pos1] == W_Kr &&
+                  _zug.z.pos.pos1 == 25 &&
+                  _zug.z.pos.pos2 == 21 |
+                      Feld[spiel.Stufe][_zug.z.pos.pos1] == S_Kr &&
+                  _zug.z.pos.pos1 == 95 &&
+                  _zug.z.pos.pos2 == 97 |
+                      Feld[spiel.Stufe][_zug.z.pos.pos1] == S_Kr &&
+                  _zug.z.pos.pos1 == 95 && _zug.z.pos.pos2 == 91) {
+                _zug.castling = true;
+              }
+              /*cout << zugToString(_zug) << " "
+                   << "Farbe:" << spiel.Farbe << " " << spiel.to_fen() << " \n"; */
+              
 
               spiel.makeZugstapel();
               bool falsch = true;
@@ -227,16 +259,16 @@ int main(int argc, char **argv) {
               }
 
               if (falsch == true)
-                goto beginning; 
+                goto beginning;
               zug_nummer += 1;
             }
           }
         }
       }
 
-      int Restzeit = 40000000;
-      int Restzeit_W = 4000000;
-      int Restzeit_S = 4000000;
+      int Restzeit = 400000000;
+      int Restzeit_W = 40000000;
+      int Restzeit_S = 40000000;
 
       if (command == "movetime") {
 
@@ -318,7 +350,8 @@ int main(int argc, char **argv) {
           break;
         }
         }
-
+        spiel.display();
+        PLOGI << "bestmove  " << bester_zug[0].z.id << "\n";
         cout << "info depth " << stopp_tatsaechlich << " score cp "
              << wert / 1.5 << " pv "
              << grundfeld_bezeichnungen[bester_zug[0].z.pos.pos1]
@@ -331,8 +364,7 @@ int main(int argc, char **argv) {
              << grundfeld_bezeichnungen[bester_zug[3].z.pos.pos2] << " "
              << grundfeld_bezeichnungen[bester_zug[4].z.pos.pos1]
              << grundfeld_bezeichnungen[bester_zug[4].z.pos.pos2] << "\n";
-        cout << "bestmove " << grundfeld_bezeichnungen[bester_zug[0].z.pos.pos1]
-             << grundfeld_bezeichnungen[bester_zug[0].z.pos.pos2] << "\n";
+        cout << "bestmove " << zugToString(bester_zug[0]) << "\n";
 
         zug_nummer += 1;
       }
@@ -393,9 +425,8 @@ int main(int argc, char **argv) {
 
       cout << "Suchtiefe " << _stopp << "\n";
 
-
       wert = bp(spiel, spiel.Farbe, -MAX_WERT, MAX_WERT, 0, _stopp, 1);
-      
+
       if ((clock() - t1 >= 300) && (_stopp >= stopp))
         break;
     }
@@ -403,7 +434,6 @@ int main(int argc, char **argv) {
     t2 = clock();
     timeline = (double)(timeline * (zug_nummer - 1) / zug_nummer +
                         (t2 - t1) / zug_nummer);
-    int spez;
     denkpaar *zugstapel = new denkpaar[200];
 
     cout << "\nmove " << (double)zug_nummer / 2 << ": "

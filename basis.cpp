@@ -1,23 +1,196 @@
-#ifndef _BASIS_
-#define _BASIS_
+#pragma once
 
 #include <cstdlib>
 #include <fstream>
 #include <iomanip>
 #include <iostream>
 #include <math.h>
+#include <plog/Log.h>
 #include <regex>
 
+#include "Spielfeld.h"
 #include "chess_types.h"
 #include "consts.h"
 #include "evalutation.h"
 #include "globals.h"
 #include "moves.h"
-#include "Spielfeld.h"
-
+#include "surge/src/position.h"
+#include "surge/src/tables.h"
+#include "surge/src/types.h"
 using namespace std;
 
+/* The Forsyth-Edwards Notation (FEN) is a standard notation for describing a
+ * particular board position of a chess game. The purpose of FEN is to provide
+ * all the necessary information to restart a game from a particular position.
+ * */
+void Spielfeld::read_fen(std::string fen) {
+  int rank = 7;                   // 8th rank first
+  int file = 0;                   // a file first
+  int part = 0;                   // part of the FEN string being parsed
+  std::string number_string = ""; // used to parse numbers in the FEN string
 
+  std::map<char, int> fenToPiece = {
+      {'r', S_T}, {'k', S_K}, {'k', S_K}, {'q', S_D}, {'r', S_T}, {'p', S_B},
+      {'b', S_L}, {'n', S_P}, {'R', W_T}, {'K', W_K}, {'K', W_K}, {'Q', W_D},
+      {'R', W_T}, {'P', W_B}, {'B', W_L}, {'N', W_P}};
+
+  // Reset the board
+  for (int i = 0; i < 120; i++) {
+    Feld[Stufe][i] = RAND;
+  }
+
+  for (char ch : fen) {
+    if (ch == ' ') { // end of a part
+      ++part;
+   
+      continue;
+    }
+
+    switch (part) {
+    case 0:            // piece placement
+      if (ch == '/') { // next rank
+        --rank;
+        file = 0;
+      } else if (isdigit(ch)) { // empty squares
+        for (int i = 0; i < ch - '0'; ++i) {
+          Feld[Stufe][rank * 10 + file + 21] = LEER;
+          ++file;
+        }
+      } else if (fenToPiece.count(ch) > 0) { // piece
+        int piece = fenToPiece[ch];
+        if (rank == 1 && ch == 'P')
+          piece = W_Bx;
+        if (rank == 6 && ch == 'p')
+          piece = S_Bx;
+        Feld[Stufe][rank * 10 + file + 21] = piece;
+        ++file;
+      }
+      break;
+    case 1: // active color
+      Farbe = (ch == 'w' ? 1 : -1);
+      break;
+    case 2: // castling availability
+      if (ch == 'K') {
+        Feld[Stufe][95] = S_Kr; // King-side for White
+        Feld[Stufe][91] = S_Tr; // Queen-side for White
+      }
+      if (ch == 'Q') {
+        Feld[Stufe][95] = S_Kr; // King-side for White
+        Feld[Stufe][98] = S_Tr; // Queen-side for White
+      }
+      if (ch == 'k') {
+        Feld[Stufe][21] = W_Tr; // King-side for Black
+        Feld[Stufe][25] = W_Kr; // King-side for Black
+      }
+      if (ch == 'q') {
+        Feld[Stufe][25] = W_Kr; // King-side for Black
+        Feld[Stufe][28] = W_Tr; // Queen-side for Black
+      }
+      break;
+    case 3: 
+    if (ch == '-')
+        break      ;       // en passant target square
+      if (islower(ch)) { // it's a file
+        file = ch - 'a';
+        rank = 0;
+      } else if (isdigit(ch)) { // it's a rank
+        rank = ch - '0';  // Convert from 1-indexed to 0-indexed
+      }
+      // The pawn that just moved two squares forward is the target
+      if (file > 0 && rank > 0 && rank < 7) {
+          int tripping_pawn = rank * 12 + file + -12;
+          if (Feld[Stufe][tripping_pawn] == W_B)
+            Feld[Stufe][tripping_pawn] = W_Bp_r;
+          tripping_pawn = tripping_pawn +2;
+          if (Feld[Stufe][tripping_pawn] == W_B)
+            Feld[Stufe][tripping_pawn] = W_Bp_l;
+          tripping_pawn = rank * 12 + file + 16;
+          if (Feld[Stufe][tripping_pawn] == S_B)
+            Feld[Stufe][tripping_pawn] = S_Bp_l;
+          tripping_pawn = tripping_pawn -2;
+          if (Feld[Stufe][tripping_pawn] == S_B)
+            Feld[Stufe][tripping_pawn] = S_Bp_r;
+      }
+      break;
+    case 4: // halfmove clock (this section is ignored for this implementation)
+      // cout << "Halfmove clock: " << ch << endl;
+      break;
+    case 5: // fullmove number
+      number_string += ch;
+      break;
+    }
+  }
+  // Parse the full move number at the end
+  move_number = number_string.empty() ? 0 : (std::stoi(number_string));
+}
+
+/* The Forsyth-Edwards Notation (FEN) is a standard notation for describing a
+ * particular board position of a chess game. The purpose of FEN is to provide
+ * all the necessary information to restart a game from a particular position.
+ * */
+inline std::string Spielfeld::to_fen() {
+
+
+  std::stringstream fen;
+  std::stringstream castling;
+  std::stringstream enPassant;
+  for (int rank = 7; rank >= 0; --rank) {
+    int empty = 0;
+    for (int file = 0; file < 8; ++file) {
+      int pos = rank * 10 + file + 21;
+      int piece = Feld[Stufe][pos]; // Adjusted to your board representation
+      if (piece == LEER) {
+        ++empty;
+      } else {
+        if (empty > 0) {
+          fen << empty;
+          empty = 0;
+        }
+        fen << pieceToFen[piece];
+      }
+      if (piece == W_Bp_r) {
+        enPassant << grundfeld_bezeichnungen[pos + 11] << "";
+      }
+        if (piece == W_Bp_l) {
+        enPassant << grundfeld_bezeichnungen[pos + 9] << "";
+      }
+      if (piece == S_Bp_r) {
+        enPassant << grundfeld_bezeichnungen[pos - 9] << "";
+      }
+      if  (piece == S_Bp_l) {
+        enPassant << grundfeld_bezeichnungen[pos - 11] << "";
+      }
+    }
+    if (empty > 0) {
+      fen << empty;
+    }
+    if (rank > 0) {
+      fen << '/';
+    }
+  }
+
+  if (Feld[Stufe][25] == W_Kr && Feld[Stufe][28] == W_Tr) {
+    castling << 'K';
+  }
+  if (Feld[Stufe][21] == W_Tr && Feld[Stufe][25] == W_Kr) {
+    castling << 'Q';
+  }
+
+  if (Feld[Stufe][95] == S_Kr && Feld[Stufe][98] == S_Tr) {
+    castling << 'k';
+  }
+  if (Feld[Stufe][95] == S_Kr && Feld[Stufe][91] == S_Tr) {
+    castling << 'q';
+  }
+
+  fen << (Farbe == 1 ? " w " : " b ");
+  fen << (castling.str().empty() ? "-" : castling.str()) << " ";
+  fen << (enPassant.str().empty() ? "-" : enPassant.str()) << " ";
+  fen << (Farbe == 1 ? "0 " : "1 ");
+  fen << this->move_number; // You can replace this with your half-move clock
+                            // and full move number
+  return fen.str();
+}
 
 howitends Spielfeld::check_end(vector<string> &_zuege) {
   find_kings();
@@ -233,8 +406,6 @@ inline void Spielfeld::setStufe(int _stufe) { Stufe = _stufe; }
 
 inline int Spielfeld::getStufe() { return Stufe; }
 
-
-
 inline void Spielfeld::zug(denkpaar &_zug) {
   setStufe(Stufe + 1);
 
@@ -258,55 +429,6 @@ inline void Spielfeld::zug(denkpaar &_zug) {
   Z = false;
 }
 
-
-
-int Spielfeld::convert_piece(char piece) {
-    /* converts a piece character to a piece integer */
-    switch (piece) {
-        case 'p': return S_P;
-        case 'r': return S_T;
-        case 'n': return S_L;
-        case 'b': return S_L;
-        case 'q': return S_D;
-        case 'k': return S_K;
-        case 'P': return W_P;
-        case 'R': return W_T;
-        case 'N': return W_L;
-        case 'B': return W_L;
-        case 'Q': return W_D;
-        case 'K': return W_K;
-        default: return LEER;
-    }
-}
-
-void Spielfeld::read_fen(std::string fen) {
-    /* FEN is a space-separated string
-     * 1st part: piece placement on the board
-     * 2nd part: active color
-     * 3rd part: castling availability
-     * 4th part: en passant target square
-     * 5th part: halfmove clock
-     * 6th part: fullmove number
-     */
-
-    int rank = 7; // 8th rank first
-    int file = 0; // a file first
-
-    for (char ch : fen) {
-        if (ch == '/') { // next rank
-            --rank;
-            file = 0;
-        } else if (isdigit(ch)) { // empty squares
-            file += ch - '0';
-        } else { // piece
-            Feld[rank][file] = convert_piece(ch);
-            ++file;
-        }
-
-        if (rank < 0 || file > 7) break; // Only parse the pieces part of the FEN
-    }
-}
-
 inline void Spielfeld::realer_zug(denkpaar &_zug, vector<string> &_zuege) {
   zug(_zug);
   zuege_append(_zuege, this->hash());
@@ -315,13 +437,16 @@ inline void Spielfeld::realer_zug(denkpaar &_zug, vector<string> &_zuege) {
 
 inline void Spielfeld::add_zug(const int &pos1, const int &pos2, const int &_n,
                                const bool &_kill, const int &_figur,
-                               const double &_order) {
+                               const double &_order, const bool &castling, const bool &enpassant) {
 
   zugstapel[Stufe][_n].z.pos.pos1 = pos1;
   zugstapel[Stufe][_n].z.pos.pos2 = pos2;
   zugstapel[Stufe][_n].kill = _kill;
   zugstapel[Stufe][_n].figur = _figur;
   zugstapel[Stufe][_n].order = _order;
+  zugstapel[Stufe][_n].castling = castling;
+  zugstapel[Stufe][_n].en_passant = enpassant;
+
   n++;
   return;
 }
@@ -486,7 +611,7 @@ int Spielfeld::zuggenerator() {
         if (figur == W_Bp_l) {
           add_verwandelung(farbvorzeichen, pos2 - 10 * farbvorzeichen, LEER, n);
           add_verwandelung(farbvorzeichen, pos2, W_B, n);
-          add_zug(pos1, pos2, n, true, figur, 0);
+          add_zug(pos1, pos2, n, true, figur, 0, false, true);
         }
 
         if (zielfeld != RAND) {
@@ -538,7 +663,7 @@ int Spielfeld::zuggenerator() {
         if (figur == W_Bp_r) {
           add_verwandelung(farbvorzeichen, pos2 - 10 * farbvorzeichen, LEER, n);
           add_verwandelung(farbvorzeichen, pos2, W_B, n);
-          add_zug(pos1, pos2, n, true, figur, 0);
+          add_zug(pos1, pos2, n, true, figur, 0, false, true);
         } else
 
             if (((zielfeld = Feld[Stufe][ziel]) != RAND)) {
@@ -712,7 +837,7 @@ int Spielfeld::zuggenerator() {
           add_verwandelung(Farbe, 97, W_K, n);
           add_verwandelung(Farbe, 96, W_T, n);
           add_verwandelung(Farbe, 98, LEER, n);
-          add_zug(95, 97, n, false, figur, 150);
+          add_zug(95, 97, n, false, figur, 150, true);
         }
       }
 
@@ -725,7 +850,7 @@ int Spielfeld::zuggenerator() {
           add_verwandelung(Farbe, 93, W_K, n);
           add_verwandelung(Farbe, 94, W_T, n);
           add_verwandelung(Farbe, 91, LEER, n);
-          add_zug(95, 93, n, false, figur, 150);
+          add_zug(95, 93, n, false, figur, 150, true);
         }
       }
     } else if (Farbe > 0) {
@@ -737,7 +862,7 @@ int Spielfeld::zuggenerator() {
           add_verwandelung(Farbe, 27, W_K, n);
           add_verwandelung(Farbe, 26, W_T, n);
           add_verwandelung(Farbe, 28, LEER, n);
-          add_zug(25, 27, n, false, figur, 150);
+          add_zug(25, 27, n, false, figur, 150, true);
         }
       }
 
@@ -750,7 +875,7 @@ int Spielfeld::zuggenerator() {
           add_verwandelung(Farbe, 23, W_K, n);
           add_verwandelung(Farbe, 24, W_T, n);
           add_verwandelung(Farbe, 21, LEER, n);
-          add_zug(25, 23, n, false, figur, 150);
+          add_zug(25, 23, n, false, figur, 150, true);
         }
       }
     }
@@ -772,9 +897,42 @@ int Spielfeld::zuggenerator() {
   return n;
 }
 
+template <Color Us> MoveList<Us> Spielfeld::move_gen() {
+  initialise_all_databases();
+  zobrist::initialise_zobrist_keys();
+
+  string fen = this->to_fen();
+  Position p;
+  Position::set(fen, p);
+
+  MoveList<Us> list(p);
+
+  return list;
+}
+
 inline denkpaar *Spielfeld::makeZugstapel() {
+
   zuggenerator();
+
+  int valid_n_ = 0;
+
+  if (this->Farbe == 1) {
+    MoveList<WHITE> move_list = move_gen<WHITE>();
+    valid_n_ =
+        filterZugstapelByMoveList<WHITE>(move_list, zugstapel[Stufe], this->n);
+
+  }
+  if (this->Farbe == -1) {
+    MoveList<BLACK> move_list = move_gen<BLACK>();
+    valid_n_ =
+        filterZugstapelByMoveList<BLACK>(move_list, zugstapel[Stufe], this->n);
+    
+    this->valid_n = valid_n_;
+  }
+
+
   Z = true;
+
   return zugstapel[Stufe];
 }
 
@@ -808,7 +966,8 @@ void Spielfeld::display() {
          << "^ >-----+-----+-----+-----+-----+-----+-----+-----< ^\n"
          << "      ";
   }
-  cout << "  >--A--+--B--+--C--+--D--+--E--+--F--+--G--+--H--< ^\n";
+  cout << "  >--A--+--B--+--C--+--D--+--E--+--F--+--G--+--H--< ^ "
+       << (Farbe == -1 ? "black" : "white") << "\n";
   cout << "\n";
 }
 
@@ -1855,5 +2014,3 @@ int sort(denkpaar _zugstapel[200], int _n, int _stufe,
 
   return 0;
 }
-
-#endif

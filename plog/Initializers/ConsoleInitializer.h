@@ -9,13 +9,13 @@ namespace plog {
 template <class Formatter, int instanceId>
 PLOG_LINKAGE_HIDDEN inline Logger<instanceId> &init(Severity maxSeverity,
                                                     OutputStream outputStream) {
-    static ColorConsoleAppender<Formatter> appender(outputStream);
-    return init<instanceId>(maxSeverity, &appender);
+  static ColorConsoleAppender<Formatter> appender(outputStream);
+  return init<instanceId>(maxSeverity, &appender);
 }
 
 template <class Formatter>
 inline Logger<PLOG_DEFAULT_INSTANCE_ID> &init(Severity maxSeverity,
                                               OutputStream outputStream) {
-    return init<Formatter, PLOG_DEFAULT_INSTANCE_ID>(maxSeverity, outputStream);
+  return init<Formatter, PLOG_DEFAULT_INSTANCE_ID>(maxSeverity, outputStream);
 }
 } // namespace plog

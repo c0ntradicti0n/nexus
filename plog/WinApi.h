@@ -24,32 +24,32 @@ typedef HKEY__ *HKEY;
 typedef size_t ULONG_PTR;
 
 struct CRITICAL_SECTION {
-    void *DebugInfo;
-    long LockCount;
-    long RecursionCount;
-    HANDLE OwningThread;
-    HANDLE LockSemaphore;
-    ULONG_PTR SpinCount;
+  void *DebugInfo;
+  long LockCount;
+  long RecursionCount;
+  HANDLE OwningThread;
+  HANDLE LockSemaphore;
+  ULONG_PTR SpinCount;
 };
 
 struct COORD {
-    short X;
-    short Y;
+  short X;
+  short Y;
 };
 
 struct SMALL_RECT {
-    short Left;
-    short Top;
-    short Right;
-    short Bottom;
+  short Left;
+  short Top;
+  short Right;
+  short Bottom;
 };
 
 struct CONSOLE_SCREEN_BUFFER_INFO {
-    COORD dwSize;
-    COORD dwCursorPosition;
-    WORD wAttributes;
-    SMALL_RECT srWindow;
-    COORD dwMaximumWindowSize;
+  COORD dwSize;
+  COORD dwCursorPosition;
+  WORD wAttributes;
+  SMALL_RECT srWindow;
+  COORD dwMaximumWindowSize;
 };
 
 namespace codePage {
@@ -161,30 +161,30 @@ __declspec(dllimport) void __stdcall OutputDebugStringW(LPCWSTR lpOutputString);
 }
 
 inline void InitializeCriticalSection(CRITICAL_SECTION *criticalSection) {
-    plog::InitializeCriticalSection(
-        reinterpret_cast<_RTL_CRITICAL_SECTION *>(criticalSection));
+  plog::InitializeCriticalSection(
+      reinterpret_cast<_RTL_CRITICAL_SECTION *>(criticalSection));
 }
 
 inline void EnterCriticalSection(CRITICAL_SECTION *criticalSection) {
-    plog::EnterCriticalSection(
-        reinterpret_cast<_RTL_CRITICAL_SECTION *>(criticalSection));
+  plog::EnterCriticalSection(
+      reinterpret_cast<_RTL_CRITICAL_SECTION *>(criticalSection));
 }
 
 inline void LeaveCriticalSection(CRITICAL_SECTION *criticalSection) {
-    plog::LeaveCriticalSection(
-        reinterpret_cast<_RTL_CRITICAL_SECTION *>(criticalSection));
+  plog::LeaveCriticalSection(
+      reinterpret_cast<_RTL_CRITICAL_SECTION *>(criticalSection));
 }
 
 inline void DeleteCriticalSection(CRITICAL_SECTION *criticalSection) {
-    plog::DeleteCriticalSection(
-        reinterpret_cast<_RTL_CRITICAL_SECTION *>(criticalSection));
+  plog::DeleteCriticalSection(
+      reinterpret_cast<_RTL_CRITICAL_SECTION *>(criticalSection));
 }
 
 inline BOOL GetConsoleScreenBufferInfo(
     HANDLE consoleOutput, CONSOLE_SCREEN_BUFFER_INFO *consoleScreenBufferInfo) {
-    return plog::GetConsoleScreenBufferInfo(
-        consoleOutput, reinterpret_cast<_CONSOLE_SCREEN_BUFFER_INFO *>(
-                           consoleScreenBufferInfo));
+  return plog::GetConsoleScreenBufferInfo(
+      consoleOutput,
+      reinterpret_cast<_CONSOLE_SCREEN_BUFFER_INFO *>(consoleScreenBufferInfo));
 }
 } // namespace plog
 #endif // _WIN32

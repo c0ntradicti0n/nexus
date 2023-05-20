@@ -3,3 +3,5 @@ chess
 pyaml
 joblib
 more_itertools
+matplotlib
+pandas

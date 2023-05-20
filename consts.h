@@ -1,5 +1,8 @@
-#ifndef _CONST_
-#define _CONST_
+#pragma once
+#ifndef CONSTS_H
+#define CONSTS_H
+#include <map>
+using namespace std;
 
 static double historyMoves[120][120];
 
@@ -21,36 +24,6 @@ enum howitends {
 };
 enum espezial { NICHTS = 0, SCHACH = 1, UNRUH = 2 };
 enum spiel_status { Eroeffnung, Mittelspiel, Spaetspiel, Endspiel };
-static const char *spiel_status_namen[] = {"Eroeffnung", "Mittelspiel",
-                                           "Mittel-Endspiel", "Endspiel"};
-enum figuren { // bei display)
-  S_Tr = -12,
-  S_Kr = -11,
-  S_K = -10,
-  S_D,
-  S_T,
-  S_L,
-  S_P,
-  S_B,
-  S_Bu,
-  S_Bp_r,
-  S_Bp_l,
-  S_Bx,
-  LEER = 0,
-  W_Bx,
-  W_Bp_l,
-  W_Bp_r,
-  W_Bu,
-  W_B,
-  W_P,
-  W_L,
-  W_T,
-  W_D,
-  W_K = 10,
-  W_Kr = 11,
-  W_Tr = 12,
-  RAND = 13
-};
 
 static const char *figuren_char[] = { // bei display)
     "tmr", "knr", "kon", "dam", "tum", "laf", "pdf", "bau", "baU",
@@ -85,6 +58,34 @@ static const char *grundfeld_bezeichnungen[120] = {
     "RAND", "RAND", "RAND", "RAND", "RAND", "RAND", "RAND", "RAND", "RAND",
     "RAND", "RAND", "RAND"};
 
+enum figuren { // bei display)
+  S_Tr = -12,
+  S_Kr = -11,
+  S_K = -10,
+  S_D,
+  S_T,
+  S_L,
+  S_P,
+  S_B,
+  S_Bu,
+  S_Bp_r,
+  S_Bp_l,
+  S_Bx,
+  LEER = 0,
+  W_Bx,
+  W_Bp_l,
+  W_Bp_r,
+  W_Bu,
+  W_B,
+  W_P,
+  W_L,
+  W_T,
+  W_D,
+  W_K = 10,
+  W_Kr = 11,
+  W_Tr = 12,
+  RAND = 13
+};
 static int grundfeld[120] = {
     RAND, RAND, RAND, RAND, RAND, RAND, RAND, RAND, RAND, RAND, RAND,
     RAND, RAND, RAND, RAND, RAND, RAND, RAND, RAND, RAND, RAND, W_Tr,
@@ -117,5 +118,16 @@ static int bewegung[15][15] = // Anzahl, Richtung, Weite, wohin[richtung]
         {1, 0, 9, 11},                            // Bauer nach seinem Start
         // { 2, 0, 9, 10, 11}, // Koenig
 };
+
+ inline std::map<int, char> pieceToFen = {
+      {S_Tr, 'r'},   {S_Kr, 'k'}, {S_K, 'k'},    {S_D, 'q'},    {S_T, 'r'},
+      {S_P, 'n'},
+
+      {S_L, 'b'},    {S_B, 'p'},  {S_Bx, 'p'},   {S_Bu, 'p'},   {S_Bp_l, 'p'},
+      {S_Bp_r, 'p'}, {S_B, 'b'},  {W_Tr, 'R'},   {W_Kr, 'K'},   {W_K, 'K'},
+      {W_P, 'N'},    {W_D, 'Q'},  {W_T, 'R'},    {W_L, 'B'},    {W_B, 'P'},
+      {W_Bx, 'P'},   {W_Bu, 'P'}, {W_Bp_l, 'P'}, {W_Bp_r, 'P'}, {W_B, 'B'},
+      {LEER, '1'}};
+
 
 #endif

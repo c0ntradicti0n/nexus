@@ -5,9 +5,9 @@
 namespace plog {
 template <class Formatter>
 class PLOG_LINKAGE_HIDDEN DebugOutputAppender : public IAppender {
-  public:
-    virtual void write(const Record &record) {
-        OutputDebugStringW(Formatter::format(record).c_str());
-    }
+public:
+  virtual void write(const Record &record) {
+    OutputDebugStringW(Formatter::format(record).c_str());
+  }
 };
 } // namespace plog
